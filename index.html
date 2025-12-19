@@ -27,14 +27,13 @@
             padding-bottom: 50px; -webkit-tap-highlight-color: transparent;
         }
 
-        /* ANTI-DOPAMINE MODES */
         body.grayscale-mode { filter: grayscale(100%) contrast(1.1); }
         body.HIGH_STRESS { background-color: #ffebee; }
         .hidden { display: none !important; }
 
         /* Navigation */
         .tab-bar { 
-            width: 100%; max-width: 500px; display: none; /* Hidden until login */
+            width: 100%; max-width: 500px; display: none;
             background: white; position: sticky; top: 0; z-index: 1000; 
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
@@ -56,35 +55,28 @@
             display: flex; justify-content: space-between; align-items: center;
         }
 
-        /* Auth Screen Styling */
-        #auth-screen { margin-top: 50px; }
-        .auth-toggle { font-size: 14px; color: var(--primary); cursor: pointer; margin-top: 15px; display: inline-block; }
+        /* Safety Net Visual */
+        .safety-net-container { height: 12px; background: #eee; border-radius: 6px; margin: 10px 0; overflow: hidden; border: 1px solid #ddd; }
+        #net-fill { height: 100%; background: linear-gradient(90deg, var(--buddy-color), var(--primary)); transition: 1.5s ease-in-out; }
+
+        /* Emotional Buttons */
+        .mood-btn { border: 1px solid #ddd; background: white; border-radius: 10px; padding: 8px; font-size: 12px; cursor: pointer; width: 30%; margin: 1%; }
+        .mood-btn.active { border-color: var(--primary); background: #e3f2fd; font-weight: bold; }
 
         /* Inputs & Buttons */
-        input, textarea { 
-            width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; 
-            border-radius: 12px; font-size: 16px; box-sizing: border-box;
-        }
-        button { 
-            width: 100%; padding: 16px; border: none; border-radius: 14px; 
-            font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 10px;
-        }
+        input, textarea { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; border-radius: 12px; font-size: 16px; box-sizing: border-box; }
+        button { width: 100%; padding: 16px; border: none; border-radius: 14px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 10px; }
         .btn-main { background: var(--primary); color: white; }
         .btn-success { background: var(--success); color: white; }
         .btn-buddy { background: var(--buddy-color); color: white; }
         .btn-disabled { background: #ccc !important; cursor: not-allowed; opacity: 0.6; }
-        .logout-link { color: var(--danger); text-decoration: none; cursor: pointer; font-weight: bold; }
-
-        /* History */
-        .history-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; text-align: left;}
+        .logout-link { color: var(--danger); cursor: pointer; font-weight: bold; }
 
         /* Animation */
-        .bubble { 
-            width: 70px; height: 70px; background: rgba(33, 150, 243, 0.2); 
-            border-radius: 50%; margin: 15px auto; display: flex; align-items: center; 
-            justify-content: center; animation: breathe 4s infinite ease-in-out;
-        }
+        .bubble { width: 70px; height: 70px; background: rgba(33, 150, 243, 0.2); border-radius: 50%; margin: 15px auto; display: flex; align-items: center; justify-content: center; animation: breathe 4s infinite ease-in-out; }
         @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+        
+        .history-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; text-align: left;}
     </style>
 </head>
 <body>
@@ -94,63 +86,78 @@
     <div id="auth-screen" class="container">
         <div class="card">
             <h1 style="color: var(--primary); margin-bottom: 5px;">Mindful Spend</h1>
-            <p id="auth-subtitle" style="color: #666; font-size: 14px; margin-bottom: 20px;">Welcome back! Please login.</p>
-            
+            <p id="auth-subtitle" style="color: #666; font-size: 14px; margin-bottom: 20px;">Your Emotional Finance Companion</p>
             <input type="email" id="auth-email" placeholder="Email Address">
             <input type="password" id="auth-pass" placeholder="Password">
-            
             <button class="btn-main" id="auth-btn" onclick="handleAuth()">Login</button>
-            
-            <span class="auth-toggle" id="toggle-text" onclick="toggleAuthMode()">Don't have an account? Sign Up</span>
+            <span style="font-size: 14px; color: var(--primary); cursor: pointer; margin-top: 15px; display: inline-block;" onclick="toggleAuthMode()">Toggle Login / Sign Up</span>
         </div>
     </div>
 
     <div class="tab-bar" id="app-nav">
         <div class="tab active" onclick="switchTab('dashboard', this)">🏠 Home</div>
-        <div class="tab" onclick="switchTab('social', this)">👥 Social</div>
-        <div class="tab" onclick="switchTab('rewards', this)">🎟️ Perks</div>
+        <div class="tab" onclick="switchTab('invest', this)">📈 Invest</div>
+        <div class="tab" onclick="switchTab('social', this)">👥 Buddy</div>
     </div>
 
     <div id="main-content" class="hidden">
+        
         <div id="dashboard-screen" class="container">
-            <div class="settings-card">
-                <div>
-                    <b>⚙️ PRO CONFIG</b> | Wage: $<input type="number" id="hourly-wage" value="25" onchange="saveAppData()" style="width:40px; border:none; background:transparent; font-weight:bold; color:var(--primary); font-size:12px;">
+            <div class="card">
+                <h4 style="margin:0 0 10px 0;">How are you feeling about money?</h4>
+                <div style="display: flex; justify-content: center;">
+                    <button class="mood-btn" onclick="setMood('Anxious', this)">😰 Anxious</button>
+                    <button class="mood-btn" onclick="setMood('Bold', this)">😎 Bold</button>
+                    <button class="mood-btn active" onclick="setMood('Bored', this)">😴 Bored</button>
                 </div>
-                <div class="logout-link" onclick="logout()">Logout</div>
             </div>
 
             <div class="card">
-                <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; color: #888;">
-                    <span>🎯 GOAL: NEW MACBOOK</span>
-                    <span id="goal-text">$0 / $1200</span>
+                <div style="text-align: left; font-size: 11px; font-weight: bold; color: #888; display: flex; justify-content: space-between;">
+                    <span>🛡️ YOUR SAFETY NET</span>
+                    <span id="net-status">40% SECURE</span>
                 </div>
-                <div style="width:100%; background:#eee; height:10px; border-radius:5px; margin-top:5px; overflow:hidden;">
-                    <div id="goal-progress" style="height:100%; background:var(--success); width:0%; transition: 1s;"></div>
-                </div>
+                <div class="safety-net-container"><div id="net-fill" style="width: 40%;"></div></div>
+                <p id="safety-msg" style="font-size: 12px; color: #666; margin-top: 5px;">You are building a bridge to your future self.</p>
             </div>
 
             <div class="card">
                 <h3 style="margin:0 0 10px 0;">🛒 Purchase Check</h3>
                 <input type="text" id="merchant" placeholder="Store name...">
                 <input type="number" id="amount" placeholder="Price ($)">
-                <button id="main-action-btn" class="btn-main" onclick="runFrictionTest()">Calculate Real Cost</button>
+                <button id="main-action-btn" class="btn-main" onclick="runFrictionTest()">Check Emotional Cost</button>
 
                 <div id="intervention-zone" class="hidden">
                     <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
                         <div id="cost-analysis-box" style="background:#fff3e0; padding:12px; border-radius:12px; font-size:13px; margin-bottom:15px; color:#e65100; text-align:left;"></div>
                         <div class="bubble">Breathe</div>
-                        <textarea id="journal-entry" placeholder="Why do I NOT need this today?"></textarea>
-                        <button id="buddy-btn" class="btn-buddy" onclick="alertBuddy()">💬 Alert Sarah J. (Unlocks Bypass)</button>
-                        <button class="btn-success" onclick="resolve('Save')">Log & Save Money</button>
-                        <button id="bypass-btn" class="btn-disabled" onclick="resolve('Spend')" disabled style="font-size:11px; background:#90a4ae; color:white;">⚠️ Emergency Bypass (Locked)</button>
+                        <textarea id="journal-entry" placeholder="Why is your future self better off without this?"></textarea>
+                        <button id="buddy-btn" class="btn-buddy" onclick="alertBuddy()">💬 Alert Sarah J. (Unlock Bypass)</button>
+                        <button class="btn-success" onclick="resolve('Save')">Save Money & Strengthen Net</button>
+                        <button id="bypass-btn" class="btn-disabled" onclick="resolve('Spend')" disabled>⚠️ Emergency Bypass (Locked)</button>
                     </div>
                 </div>
             </div>
+            
+            <div class="settings-card">
+                <div><b>⚙️ WAGE:</b> $<input type="number" id="hourly-wage" value="25" onchange="saveAppData()" style="width:35px; border:none; background:transparent; font-weight:bold; color:var(--primary);"></div>
+                <div class="logout-link" onclick="logout()">Logout</div>
+            </div>
+        </div>
 
-            <div class="card" style="text-align:left;">
-                <h4 style="margin:0 0 10px 0;">🏆 Recent Victories</h4>
-                <div id="history-log"><div class="history-item"><i>No savings logged yet.</i></div></div>
+        <div id="invest-screen" class="container hidden">
+            <div class="card">
+                <h3>📈 Strategic Decision Shield</h3>
+                <p style="font-size: 13px; color: #666;">Entering a trade? Let's check the vibes.</p>
+                <input type="text" id="asset" placeholder="Asset (e.g. BTC, NVIDIA)">
+                <textarea id="invest-reason" placeholder="Why are you making this move? (e.g. 'I fear I'm missing out')"></textarea>
+                <button class="btn-buddy" onclick="startInvestCoolDown()">Start Management Pause</button>
+            </div>
+
+            <div id="cool-down-zone" class="card hidden">
+                <div class="bubble" style="background: rgba(103, 58, 183, 0.2);">Pause</div>
+                <p id="timer-text" style="font-weight: bold; color: var(--buddy-color);">Wait 30s to unlock trade...</p>
+                <div id="translator-box" style="background:#f3e5f5; padding:15px; border-radius:12px; font-size:13px; margin-top:15px; border-left: 5px solid var(--buddy-color); text-align: left;"></div>
             </div>
         </div>
 
@@ -159,48 +166,25 @@
                 <h3>👥 Buddy Feed</h3>
                 <div id="social-feed">
                     <div style="text-align:left; padding:10px; background:#f9f9f9; border-radius:10px; margin-bottom:10px; font-size:13px;">
-                        <b>Sarah J.</b>: "Watching your back! Let's hit that MacBook goal."
+                        <b>Sarah J.</b>: "Feeling anxious today? Remember, finance is about safety, not speed. I'm watching your back."
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="rewards-screen" class="container hidden">
-            <div class="card"><h3>🎟️ Your Perks</h3><p id="reward-status">Locked until your next $100 save.</p></div>
-        </div>
     </div>
 
     <script>
-        // STATE MANAGEMENT
-        let isLoginMode = true;
         let state = JSON.parse(localStorage.getItem('mindfulSpendData')) || {
             isLoggedIn: false,
             totalSaved: 420.00,
             goal: 1200.00,
-            history: [],
             wage: 25,
-            buddyAlerted: false
+            history: [],
+            currentMood: 'Bored'
         };
 
-        // --- AUTH FUNCTIONS ---
-        function toggleAuthMode() {
-            isLoginMode = !isLoginMode;
-            document.getElementById('auth-btn').innerText = isLoginMode ? "Login" : "Sign Up";
-            document.getElementById('auth-subtitle').innerText = isLoginMode ? "Welcome back! Please login." : "Create an account to start saving.";
-            document.getElementById('toggle-text').innerText = isLoginMode ? "Don't have an account? Sign Up" : "Already have an account? Login";
-        }
-
         function handleAuth() {
-            const email = document.getElementById('auth-email').value;
-            const pass = document.getElementById('auth-pass').value;
-
-            if (email.length < 5 || pass.length < 5) {
-                alert("Please enter a valid email and password.");
-                return;
-            }
-
-            // For now, this is a "Fake" auth that lets anyone in.
-            // To make this real, you would connect Firebase here.
             state.isLoggedIn = true;
             saveAppData();
             initApp();
@@ -209,7 +193,7 @@
         function logout() {
             state.isLoggedIn = false;
             saveAppData();
-            location.reload(); // Refresh to lock the app
+            location.reload();
         }
 
         function initApp() {
@@ -221,67 +205,74 @@
             }
         }
 
-        // --- CORE APP FUNCTIONS ---
-        function saveAppData() {
-            state.wage = document.getElementById('hourly-wage').value;
-            localStorage.setItem('mindfulSpendData', JSON.stringify(state));
+        function setMood(mood, el) {
+            state.currentMood = mood;
+            document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            if(mood === 'Anxious') {
+                document.body.style.filter = "sepia(0.2)";
+                document.getElementById('safety-msg').innerText = "It's okay to be careful. Slow growth is still growth.";
+            } else {
+                document.body.style.filter = "none";
+                document.getElementById('safety-msg').innerText = "You are building a bridge to your future self.";
+            }
         }
 
-        function switchTab(tabId, el) {
-            document.querySelectorAll('#main-content .container').forEach(c => c.classList.add('hidden'));
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.getElementById(tabId + '-screen').classList.remove('hidden');
-            el.classList.add('active');
+        function startInvestCoolDown() {
+            const reason = document.getElementById('invest-reason').value.toLowerCase();
+            document.getElementById('cool-down-zone').classList.remove('hidden');
+            
+            // The Reality Translator
+            let msg = "Putting money here is like planting a tree. You don't dig it up every day to see if it's growing.";
+            if(reason.includes('fomo') || reason.includes('miss')) msg = "💡 <b>Relative Reality:</b> Chasing a moving train is dangerous. Wait for the next quiet station.";
+            if(reason.includes('fear') || reason.includes('drop')) msg = "💡 <b>Relative Reality:</b> A market dip is just a 'Winter Sale' on the future. Stay warm and stay put.";
+            
+            document.getElementById('translator-box').innerHTML = msg;
+
+            let timeLeft = 30;
+            const timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer-text').innerText = `Wait ${timeLeft}s to unlock trade...`;
+                if(timeLeft <= 0) {
+                    clearInterval(timer);
+                    document.getElementById('timer-text').innerHTML = `<button class="btn-success" onclick="confirmTrade()">Confirm Decision (I am Calm)</button>`;
+                }
+            }, 1000);
+        }
+
+        function confirmTrade() {
+            confetti();
+            alert("Decision logged safely.");
+            document.getElementById('cool-down-zone').classList.add('hidden');
+            document.getElementById('invest-reason').value = "";
         }
 
         function runFrictionTest() {
             const amt = parseFloat(document.getElementById('amount').value);
             const wage = parseFloat(document.getElementById('hourly-wage').value) || 25;
             if (!amt) return;
-
             const hours = (amt / wage).toFixed(1);
-            const futureVal = (amt * Math.pow(1.07, 10)).toFixed(0);
-
-            if (amt >= 100) {
-                document.body.classList.add('HIGH_STRESS', 'grayscale-mode');
-                document.getElementById('intervention-zone').classList.remove('hidden');
-                document.getElementById('cost-analysis-box').innerHTML = 
-                    `⏳ <b>Life Cost:</b> ${hours} hours of work<br>` +
-                    `📈 <b>Future Loss:</b> $${futureVal} if invested (10yrs)`;
-            } else {
-                alert(`Low impact. This costs ${hours} work hours.`);
-            }
+            document.body.classList.add('HIGH_STRESS', 'grayscale-mode');
+            document.getElementById('intervention-zone').classList.remove('hidden');
+            document.getElementById('cost-analysis-box').innerHTML = `⏳ <b>Life Cost:</b> ${hours} hours of your life energy.`;
         }
 
         function alertBuddy() {
-            state.buddyAlerted = true;
             const bBtn = document.getElementById('buddy-btn');
-            bBtn.innerHTML = "✅ Sarah J. has been notified!";
+            bBtn.innerHTML = "✅ Sarah notified!";
             bBtn.style.background = "#4CAF50";
-            const bypass = document.getElementById('bypass-btn');
-            bypass.disabled = false;
-            bypass.classList.remove('btn-disabled');
-            bypass.style.background = "#f44336";
-            bypass.innerText = "⚠️ Emergency Bypass (Unlocked)";
+            document.getElementById('bypass-btn').disabled = false;
+            document.getElementById('bypass-btn').classList.remove('btn-disabled');
+            document.getElementById('bypass-btn').style.background = "#f44336";
         }
 
         function resolve(choice) {
-            const amt = parseFloat(document.getElementById('amount').value);
-            const shop = document.getElementById('merchant').value || "Store";
-
             if (choice === 'Save') {
-                if (!document.getElementById('journal-entry').value) return alert("Write your reflection first!");
+                const amt = parseFloat(document.getElementById('amount').value);
                 state.totalSaved += amt;
-                state.history.unshift({ shop, amt, date: new Date().toLocaleDateString() });
-
-                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                confetti();
                 document.getElementById('success-sound').play();
-
-                const feed = document.getElementById('social-feed');
-                feed.innerHTML = `<div style="padding:10px; background:#e8f5e9; border-radius:10px; margin-bottom:10px; font-size:13px; text-align:left;">
-                    <b>YOU</b> saved $${amt} at ${shop}! 🚀</div>` + feed.innerHTML;
             }
-
             saveAppData();
             updateView();
             resetUI();
@@ -289,21 +280,21 @@
 
         function updateView() {
             const perc = (state.totalSaved / state.goal) * 100;
-            const progressEl = document.getElementById('goal-progress');
-            if(progressEl) progressEl.style.width = Math.min(perc, 100) + "%";
-            
-            document.getElementById('goal-text').innerText = `$${state.totalSaved.toFixed(0)} / $${state.goal}`;
+            document.getElementById('net-fill').style.width = Math.min(perc, 100) + "%";
+            document.getElementById('net-status').innerText = Math.min(perc, 100).toFixed(0) + "% SECURE";
             document.getElementById('hourly-wage').value = state.wage;
+        }
 
-            const log = document.getElementById('history-log');
-            if (state.history.length > 0) {
-                log.innerHTML = state.history.map(item => `
-                    <div class="history-item">
-                        <span><b>${item.shop}</b></span>
-                        <span style="color:var(--success)">+$${item.amt} saved</span>
-                    </div>
-                `).join('');
-            }
+        function saveAppData() {
+            state.wage = document.getElementById('hourly-wage').value;
+            localStorage.setItem('mindfulSpendData', JSON.stringify(state));
+        }
+
+        function switchTab(tabId, el) {
+            document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabId + '-screen').classList.remove('hidden');
+            el.classList.add('active');
         }
 
         function resetUI() {
@@ -311,21 +302,12 @@
             document.getElementById('intervention-zone').classList.add('hidden');
             document.getElementById('amount').value = "";
             document.getElementById('merchant').value = "";
-            document.getElementById('journal-entry').value = "";
-            state.buddyAlerted = false;
-            
-            const bBtn = document.getElementById('buddy-btn');
-            bBtn.innerHTML = "💬 Alert Sarah J. (Unlock Bypass)";
-            bBtn.style.background = "var(--buddy-color)";
-            const bypass = document.getElementById('bypass-btn');
-            bypass.disabled = true;
-            bypass.classList.add('btn-disabled');
-            bypass.style.background = "#90a4ae";
-            bypass.innerText = "⚠️ Emergency Bypass (Locked)";
+            document.getElementById('buddy-btn').innerHTML = "💬 Alert Sarah J. (Unlock Bypass)";
+            document.getElementById('buddy-btn').style.background = "var(--buddy-color)";
         }
 
         window.onload = initApp;
     </script>
 </body>
 </html>
-           
+      
