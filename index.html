@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Mindful Spend Pro</title>
+    <title>Mindful Spend Pro: Nerve Center</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -18,16 +18,16 @@
             --warning: #FF9800;
             --buddy-color: #673ab7;
             --bg: #f4f7f6;
+            --card-grad: linear-gradient(135deg, #673ab7, #2196F3);
         }
 
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
             background-color: var(--bg); margin: 0; display: flex; flex-direction: column; 
             align-items: center; min-height: 100vh; transition: filter 0.8s ease, background 0.5s;
-            padding-bottom: 60px; -webkit-tap-highlight-color: transparent;
+            padding-bottom: 70px; -webkit-tap-highlight-color: transparent;
         }
 
-        /* ANTI-DOPAMINE MODES */
         body.grayscale-mode { filter: grayscale(100%) contrast(1.1); }
         body.HIGH_STRESS { background-color: #ffebee; }
         .hidden { display: none !important; }
@@ -40,7 +40,7 @@
         }
         .tab { 
             padding: 18px; cursor: pointer; flex: 1; text-align: center; 
-            font-weight: bold; color: #aaa; border-bottom: 3px solid transparent; font-size: 13px;
+            font-weight: bold; color: #aaa; border-bottom: 3px solid transparent; font-size: 12px;
         }
         .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
 
@@ -49,31 +49,37 @@
         .card { 
             background: white; padding: 20px; border-radius: 24px; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 15px; text-align: center;
+            position: relative; overflow: hidden;
         }
-        
+
+        /* Proactive Hub */
+        .hub-card { background: var(--card-grad); color: white; text-align: left; }
+        .market-tag { 
+            display: inline-block; background: rgba(255,255,255,0.2); 
+            padding: 4px 10px; border-radius: 8px; font-size: 10px; margin-right: 5px; margin-top: 10px;
+        }
+
+        /* Wallet & Bank Styles */
+        .bank-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+        .bank-info { text-align: left; }
+        .bank-info span { font-size: 10px; color: #888; display: block; }
+        .bank-balance { font-weight: bold; font-family: monospace; }
+
         /* Safety Net Visual */
         .safety-net-container { height: 12px; background: #eee; border-radius: 6px; margin: 10px 0; overflow: hidden; border: 1px solid #ddd; }
         #net-fill { height: 100%; background: linear-gradient(90deg, var(--buddy-color), var(--primary)); transition: 1.5s ease-in-out; }
 
-        /* Emotional Buttons */
-        .mood-btn { border: 1px solid #ddd; background: white; border-radius: 12px; padding: 10px; font-size: 12px; cursor: pointer; width: 30%; margin: 1%; transition: 0.3s; }
-        .mood-btn.active { border-color: var(--primary); background: #e3f2fd; font-weight: bold; transform: scale(1.05); }
-
-        /* Inputs & Buttons */
+        /* General UI */
+        .mood-btn { border: 1px solid #ddd; background: white; border-radius: 12px; padding: 10px; font-size: 12px; cursor: pointer; width: 30%; margin: 1%; }
+        .mood-btn.active { border-color: var(--primary); background: #e3f2fd; font-weight: bold; }
         input, textarea, select { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; border-radius: 14px; font-size: 16px; box-sizing: border-box; }
         button { width: 100%; padding: 16px; border: none; border-radius: 16px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 10px; }
         .btn-main { background: var(--primary); color: white; }
         .btn-success { background: var(--success); color: white; }
         .btn-buddy { background: var(--buddy-color); color: white; }
-        .btn-disabled { background: #ccc !important; cursor: not-allowed; opacity: 0.6; }
         
-        /* Wallet Styles */
-        .wallet-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
-        .currency-badge { background: #f0f4f8; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; color: var(--primary); }
-
-        /* Animation */
-        .bubble { width: 70px; height: 70px; background: rgba(33, 150, 243, 0.2); border-radius: 50%; margin: 15px auto; display: flex; align-items: center; justify-content: center; animation: breathe 4s infinite ease-in-out; }
-        @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+        .bubble { width: 60px; height: 60px; background: rgba(33, 150, 243, 0.2); border-radius: 50%; margin: 15px auto; display: flex; align-items: center; justify-content: center; animation: breathe 4s infinite ease-in-out; }
+        @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
     </style>
 </head>
 <body>
@@ -83,112 +89,129 @@
     <div id="auth-screen" class="container" style="margin-top: 50px;">
         <div class="card">
             <h1 style="color: var(--primary); margin-bottom: 5px;">Mindful Spend</h1>
-            <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Your Emotional Financial Companion</p>
+            <p style="color: #666; font-size: 14px; margin-bottom: 20px;">The Financial Nerve Center</p>
             <input type="email" id="auth-email" placeholder="Email Address">
             <input type="password" id="auth-pass" placeholder="Password">
-            <button class="btn-main" onclick="handleAuth()">Login</button>
+            <button class="btn-main" onclick="handleAuth()">Unlock Command Center</button>
         </div>
     </div>
 
     <div class="tab-bar" id="app-nav">
         <div class="tab active" onclick="switchTab('dashboard', this)">🏠 Home</div>
-        <div class="tab" onclick="switchTab('wallet', this)">👛 Wallet</div>
-        <div class="tab" onclick="switchTab('invest', this)">📈 Invest</div>
+        <div class="tab" onclick="switchTab('wallet', this)">👛 Assets</div>
+        <div class="tab" onclick="switchTab('invest', this)">📈 Shield</div>
         <div class="tab" onclick="switchTab('social', this)">👥 Buddy</div>
     </div>
 
     <div id="main-content" class="hidden">
         
         <div id="dashboard-screen" class="container">
-            <div class="card">
-                <h4 style="margin:0 0 12px 0;">How is your heart today?</h4>
-                <div style="display: flex; justify-content: center;">
-                    <button class="mood-btn" onclick="setMood('Anxious', this)">😰 Anxious</button>
-                    <button class="mood-btn" onclick="setMood('Bold', this)">😎 Bold</button>
-                    <button class="mood-btn active" onclick="setMood('Bored', this)">😴 Bored</button>
+            <div class="card hub-card">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <h4 style="margin:0; font-size: 14px;">🤖 CO-PILOT BRIEFING</h4>
+                    <span id="market-status" style="font-size: 10px; background: #4CAF50; padding: 2px 6px; border-radius: 4px;">MARKET OPEN</span>
+                </div>
+                <p id="proactive-advice" style="font-size: 13px; margin: 12px 0; line-height: 1.5;">
+                    "Analyzing your 3 linked accounts. Gold is up 1.2%, making your current holdings more valuable. Consider a Fixed Deposit for your surplus USD."
+                </p>
+                <div style="overflow-x: auto; white-space: nowrap;">
+                    <div class="market-tag">🟡 Gold: $2,150</div>
+                    <div class="market-tag">🏦 FD Rate: 7.2%</div>
+                    <div class="market-tag">👗 ZARA: 40% OFF</div>
                 </div>
             </div>
 
             <div class="card">
                 <div style="text-align: left; font-size: 11px; font-weight: bold; color: #888; display: flex; justify-content: space-between;">
-                    <span>🛡️ PEACE OF MIND NET</span>
+                    <span>🛡️ UNIFIED SAFETY NET</span>
                     <span id="net-status">40% SECURE</span>
                 </div>
                 <div class="safety-net-container"><div id="net-fill" style="width: 40%;"></div></div>
-                <p id="safety-msg" style="font-size: 12px; color: #666; margin-top: 5px;">Every save strengthens your bridge to tomorrow.</p>
+                <p id="safety-msg" style="font-size: 12px; color: #666; margin-top: 5px;">Your total wealth across all banks is growing.</p>
+            </div>
+
+            <div class="card" style="text-align: left; border-left: 4px solid var(--primary); padding: 15px;">
+                <small style="color: var(--primary); font-weight: bold;">📖 DAILY FINANCIAL LESSON</small>
+                <p id="daily-tip" style="font-size: 13px; margin: 5px 0; color: #444;">"An Emergency Fund should cover 6 months of life. You are currently at 2.4 months."</p>
             </div>
 
             <div class="card">
                 <h3 style="margin:0 0 10px 0;">🛒 Pulse Check</h3>
-                <input type="text" id="merchant" placeholder="Where are you spending?">
-                <input type="number" id="amount" placeholder="Amount ($)">
-                <button class="btn-main" onclick="runFrictionTest()">Analyze Emotional Impact</button>
+                <input type="text" id="merchant" placeholder="Store or Item name...">
+                <input type="number" id="amount" placeholder="Price ($)">
+                <button class="btn-main" onclick="runFrictionTest()">Calculate Life-Cost</button>
 
                 <div id="intervention-zone" class="hidden">
-                    <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
-                        <div id="cost-analysis-box" style="background:#fff3e0; padding:12px; border-radius:12px; font-size:13px; margin-bottom:15px; color:#e65100; text-align:left;"></div>
+                    <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+                        <div id="cost-analysis-box" style="background:#fff3e0; padding:12px; border-radius:12px; font-size:13px; margin-bottom:15px; color:#e65100;"></div>
                         <div class="bubble">Breathe</div>
-                        <textarea id="journal-entry" placeholder="I am choosing to wait because..."></textarea>
-                        <button id="buddy-btn" class="btn-buddy" onclick="alertBuddy()">💬 Alert Sarah J. (Unlock Bypass)</button>
-                        <button class="btn-success" onclick="resolve('Save')">Log Growth & Save</button>
-                        <button id="bypass-btn" class="btn-disabled" onclick="resolve('Spend')" disabled style="font-size: 12px;">⚠️ Emergency Bypass (Locked)</button>
+                        <button class="btn-success" onclick="resolve('Save')">Save to Primary Bank</button>
+                        <button id="buddy-btn" class="btn-buddy" onclick="alertBuddy()" style="font-size: 14px;">💬 Notify Buddy to Unlock Spend</button>
+                        <button id="bypass-btn" class="btn-disabled" onclick="resolve('Spend')" disabled style="font-size: 12px; margin-top: 5px;">⚠️ Emergency Bypass</button>
                     </div>
                 </div>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; padding: 10px; font-size: 12px; color: #888;">
-                <span>Wage: $<input type="number" id="hourly-wage" value="25" onchange="saveAppData()" style="width:30px; border:none; background:transparent; font-weight:bold; color:var(--primary); padding:0; margin:0; display:inline;">/hr</span>
-                <span onclick="logout()" style="cursor:pointer; color:var(--danger); font-weight:bold;">Logout</span>
             </div>
         </div>
 
         <div id="wallet-screen" class="container hidden">
-            <div class="card" style="text-align: left;">
-                <h3 style="margin-top:0;">Global Assets</h3>
-                <div class="wallet-row"><span>💵 Bank (USD)</span><b id="wal-usd">$2,450.00</b></div>
-                <div class="wallet-row"><span>🪙 Crypto (BTC)</span><b id="wal-btc">0.042 BTC</b></div>
-                <div class="wallet-row"><span>🌍 Travel (EUR)</span><b id="wal-eur">€120.00</b></div>
+            <div class="card">
+                <h3 style="margin: 0 0 15px 0; text-align: left;">Unified Balance</h3>
+                <div id="bank-list">
+                    <div class="bank-row">
+                        <div class="bank-info"><b>Chase Checking</b><span>**** 4290</span></div>
+                        <div class="bank-balance" id="bal-chase">$1,200.00</div>
+                    </div>
+                    <div class="bank-row">
+                        <div class="bank-info"><b>Binance (BTC)</b><span>Exchange Wallet</span></div>
+                        <div class="bank-balance" id="bal-crypto">0.042 BTC</div>
+                    </div>
+                    <div class="bank-row">
+                        <div class="bank-info"><b>Savings (Fixed Deposit)</b><span>Matures Oct 2026</span></div>
+                        <div class="bank-balance" id="bal-fd">$5,000.00</div>
+                    </div>
+                </div>
+                <button class="btn-buddy" style="padding: 10px; font-size: 12px; margin-top: 15px;" onclick="simulateLink()">+ Link New Bank or Wallet</button>
             </div>
 
             <div class="card">
-                <h4>🌍 Reality Converter</h4>
+                <h4>🌍 Global Converter</h4>
                 <div style="display: flex; gap: 8px;">
-                    <input type="number" id="conv-amt" placeholder="Value" style="flex:2;">
-                    <select id="conv-from" style="flex:1;">
+                    <input type="number" id="conv-amt" placeholder="Amount">
+                    <select id="conv-from" style="width: 120px;">
                         <option value="USD">USD</option>
                         <option value="EUR">EUR</option>
                         <option value="BTC">BTC</option>
+                        <option value="GOLD">GOLD (oz)</option>
                     </select>
                 </div>
-                <p id="conv-res" style="font-size: 24px; font-weight: bold; color: var(--buddy-color); margin: 10px 0;">$0.00</p>
+                <p id="conv-res" style="font-size: 24px; font-weight: bold; color: var(--buddy-color);">$0.00</p>
                 <div id="reality-check" style="background:#e8f5e9; padding:12px; border-radius:12px; font-size:12px; color:#2e7d32; text-align: left;">
-                    Select an amount to see its relative reality.
+                    Select an asset to see its "Real World" value.
                 </div>
             </div>
         </div>
 
         <div id="invest-screen" class="container hidden">
             <div class="card">
-                <h3>📈 Strategic Shield</h3>
-                <p style="font-size: 13px; color: #666;">Don't let the market rush you. Breathe first.</p>
-                <input type="text" id="asset" placeholder="Asset (e.g. BTC, NVIDIA)">
-                <textarea id="invest-reason" placeholder="Why now? (e.g. 'I'm scared it's going up without me')"></textarea>
-                <button class="btn-buddy" onclick="startInvestCoolDown()">Start Management Pause</button>
+                <h3>📈 Shield & Strategy</h3>
+                <p style="font-size: 13px; color: #666;">Current Strategy: <b>Conservative Growth</b></p>
+                <input type="text" id="asset" placeholder="Asset (BTC, NVIDIA, GOLD)">
+                <textarea id="invest-reason" placeholder="What is your logic for this move?"></textarea>
+                <button class="btn-buddy" onclick="startInvestCoolDown()">Engage 30s Logic Filter</button>
             </div>
-
             <div id="cool-down-zone" class="card hidden">
-                <div class="bubble" style="background: rgba(103, 58, 183, 0.2);">Pause</div>
-                <p id="timer-text" style="font-weight: bold; color: var(--buddy-color);">Wait 30s to unlock trade...</p>
-                <div id="translator-box" style="background:#f3e5f5; padding:15px; border-radius:12px; font-size:13px; margin-top:15px; border-left: 5px solid var(--buddy-color); text-align: left;"></div>
+                <div class="bubble">Wait</div>
+                <p id="timer-text" style="font-weight: bold; color: var(--buddy-color);">Cooling down...</p>
+                <div id="translator-box" style="background:#f3e5f5; padding:15px; border-radius:12px; font-size:13px; border-left: 5px solid var(--buddy-color); text-align: left;"></div>
             </div>
         </div>
 
         <div id="social-screen" class="container hidden">
             <div class="card">
-                <h3>👥 Sarah J. (Companion)</h3>
+                <h3>👥 Sarah J.</h3>
                 <div id="social-feed">
-                    <div style="text-align:left; padding:15px; background:#f9f9f9; border-radius:16px; margin-bottom:10px; font-size:14px; line-height: 1.4;">
-                        "I'm here to catch you when things feel fast. You're doing great."
+                    <div style="text-align:left; padding:15px; background:#f9f9f9; border-radius:16px; margin-bottom:10px; font-size:14px;">
+                        "You saved $45 today by skipping that takeout. I've logged that toward your safety net!"
                     </div>
                 </div>
             </div>
@@ -199,25 +222,25 @@
     <script>
         let state = JSON.parse(localStorage.getItem('mindfulSpendData')) || {
             isLoggedIn: false,
-            totalSaved: 420.00,
-            goal: 1200.00,
+            totalSaved: 6200.00,
+            goal: 15000.00,
             wage: 25,
             history: [],
-            currentMood: 'Bored'
+            lastAction: Date.now()
         };
 
-        const rates = { USD: 1, EUR: 0.92, BTC: 0.000015 };
+        const rates = { USD: 1, EUR: 0.92, BTC: 0.000015, GOLD: 0.00048 };
+        const tips = [
+            "The 50/30/20 Rule: 50% Needs, 30% Wants, 20% Savings.",
+            "FDs are great now because interest rates are at a 5-year high.",
+            "Gold is a hedge against inflation. Keep 5-10% of your wealth there.",
+            "A Savings account is for liquid cash; a Current account is for high-volume transactions."
+        ];
 
         function handleAuth() {
             state.isLoggedIn = true;
             saveAppData();
             initApp();
-        }
-
-        function logout() {
-            state.isLoggedIn = false;
-            saveAppData();
-            location.reload();
         }
 
         function initApp() {
@@ -226,87 +249,53 @@
                 document.getElementById('main-content').classList.remove('hidden');
                 document.getElementById('app-nav').style.display = 'flex';
                 updateView();
+                checkProactiveAdvice();
             }
         }
 
-        function setMood(mood, el) {
-            state.currentMood = mood;
-            document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
-            el.classList.add('active');
+        function checkProactiveAdvice() {
+            const adviceEl = document.getElementById('proactive-advice');
+            const tipEl = document.getElementById('daily-tip');
             
-            if(mood === 'Anxious') {
-                document.body.style.filter = "sepia(0.25)";
-                document.getElementById('safety-msg').innerText = "Security is the priority. Small steps are okay.";
+            // Proactive Logic based on Balance
+            if (state.totalSaved < 5000) {
+                adviceEl.innerHTML = "⚠️ <b>High Risk Alert:</b> Your unified liquid balance is below target. Avoid the ZARA sale; put any spare cash into your Chase Savings (4.1% APY).";
+                document.body.style.filter = "sepia(0.1)";
             } else {
-                document.body.style.filter = "none";
-                document.getElementById('safety-msg').innerText = "Every save strengthens your bridge to tomorrow.";
+                adviceEl.innerHTML = "🌟 <b>Growth Opportunity:</b> You have a surplus. Bank FDs are offering 7.2% today—better than keeping it in your Current account!";
+            }
+            
+            tipEl.innerText = tips[Math.floor(Math.random() * tips.length)];
+        }
+
+        function simulateLink() {
+            const bank = prompt("Enter Bank Name (e.g. HSBC, Coinbase, Apple Card):");
+            if(bank) {
+                alert(`Securely connecting to ${bank}... Unified balance updated.`);
+                confetti();
             }
         }
 
-        function switchTab(tabId, el) {
-            document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.getElementById(tabId + '-screen').classList.remove('hidden');
-            el.classList.add('active');
-        }
-
-        // Wallet Converter Logic
+        // Converter
         document.getElementById('conv-amt')?.addEventListener('input', () => {
             const amt = parseFloat(document.getElementById('conv-amt').value) || 0;
             const from = document.getElementById('conv-from').value;
             const usdVal = amt / rates[from];
             document.getElementById('conv-res').innerText = `$${usdVal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
             
-            let reality = "Every dollar is time.";
-            if(from === 'BTC') reality = "💡 <b>Relative Reality:</b> This is digital gold. It's meant for the 10-year you, not the today you.";
-            if(from === 'EUR') reality = "💡 <b>Relative Reality:</b> That's about " + (usdVal / 10).toFixed(0) + " meals in a local café.";
+            let reality = "This is your life energy.";
+            if(from === 'GOLD') reality = "💡 <b>Asset View:</b> Gold is 'Patient Money.' It doesn't grow fast, but it never dies.";
+            if(from === 'BTC') reality = "💡 <b>Risk View:</b> This is high volatility. Only invest what you can 'lose' without crying.";
             document.getElementById('reality-check').innerHTML = reality;
         });
 
-        // Invest Logic
-        function startInvestCoolDown() {
-            const reason = document.getElementById('invest-reason').value.toLowerCase();
-            document.getElementById('cool-down-zone').classList.remove('hidden');
-            
-            let msg = "A market is a device for transferring money from the impatient to the patient.";
-            if(reason.includes('fomo') || reason.includes('miss')) msg = "💡 <b>Reality Check:</b> Chasing a green candle is like chasing a train that already left. Wait for the next one.";
-            if(reason.includes('fear') || reason.includes('drop')) msg = "💡 <b>Reality Check:</b> Red days are just the market breathing. Don't panic because the numbers are changing colors.";
-            
-            document.getElementById('translator-box').innerHTML = msg;
-
-            let timeLeft = 30;
-            const timer = setInterval(() => {
-                timeLeft--;
-                document.getElementById('timer-text').innerText = `Wait ${timeLeft}s to unlock trade...`;
-                if(timeLeft <= 0) {
-                    clearInterval(timer);
-                    document.getElementById('timer-text').innerHTML = `<button class="btn-success" onclick="confirmTrade()">Confirm Decision (I am Calm)</button>`;
-                }
-            }, 1000);
-        }
-
-        function confirmTrade() {
-            confetti();
-            alert("Decision logged safely.");
-            document.getElementById('cool-down-zone').classList.add('hidden');
-        }
-
         function runFrictionTest() {
             const amt = parseFloat(document.getElementById('amount').value);
-            const wage = parseFloat(document.getElementById('hourly-wage').value) || 25;
             if (!amt) return;
-            const hours = (amt / wage).toFixed(1);
+            const hours = (amt / state.wage).toFixed(1);
             document.body.classList.add('HIGH_STRESS', 'grayscale-mode');
             document.getElementById('intervention-zone').classList.remove('hidden');
-            document.getElementById('cost-analysis-box').innerHTML = `⏳ <b>Life Cost:</b> ${hours} hours of your life energy.`;
-        }
-
-        function alertBuddy() {
-            const bBtn = document.getElementById('buddy-btn');
-            bBtn.innerHTML = "✅ Sarah notified!"; bBtn.style.background = "#4CAF50";
-            document.getElementById('bypass-btn').disabled = false;
-            document.getElementById('bypass-btn').classList.remove('btn-disabled');
-            document.getElementById('bypass-btn').style.background = "#f44336";
+            document.getElementById('cost-analysis-box').innerHTML = `⚠️ <b>Proactive Warning:</b> This item costs <b>${hours} hours</b> of your life. ZARA has a sale next week—wait?`;
         }
 
         function resolve(choice) {
@@ -321,15 +310,22 @@
             resetUI();
         }
 
+        function switchTab(tabId, el) {
+            document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabId + '-screen').classList.remove('hidden');
+            el.classList.add('active');
+        }
+
         function updateView() {
             const perc = (state.totalSaved / state.goal) * 100;
             document.getElementById('net-fill').style.width = Math.min(perc, 100) + "%";
             document.getElementById('net-status').innerText = Math.min(perc, 100).toFixed(0) + "% SECURE";
-            document.getElementById('hourly-wage').value = state.wage;
+            document.getElementById('bal-chase').innerText = `$${(state.totalSaved * 0.2).toFixed(2)}`;
+            document.getElementById('bal-fd').innerText = `$${(state.totalSaved * 0.8).toFixed(2)}`;
         }
 
         function saveAppData() {
-            state.wage = document.getElementById('hourly-wage').value;
             localStorage.setItem('mindfulSpendData', JSON.stringify(state));
         }
 
@@ -338,12 +334,16 @@
             document.getElementById('intervention-zone').classList.add('hidden');
             document.getElementById('amount').value = "";
             document.getElementById('merchant').value = "";
-            document.getElementById('buddy-btn').innerHTML = "💬 Alert Sarah J. (Unlock Bypass)";
-            document.getElementById('buddy-btn').style.background = "var(--buddy-color)";
+        }
+
+        function alertBuddy() {
+            document.getElementById('buddy-btn').innerText = "Buddy Alerted! (Bypass Unlocked)";
+            document.getElementById('bypass-btn').disabled = false;
+            document.getElementById('bypass-btn').classList.remove('btn-disabled');
+            document.getElementById('bypass-btn').style.background = "var(--danger)";
         }
 
         window.onload = initApp;
     </script>
 </body>
 </html>
-        
