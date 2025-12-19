@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Mindful Spend Pro</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #2196F3;
+            --success: #4CAF50;
+            --danger: #f44336;
+            --warning: #FF9800;
+            --buddy-color: #673ab7;
+            --bg: #f4f7f6;
+        }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background-color: var(--bg); margin: 0; display: flex; flex-direction: column; 
+            align-items: center; min-height: 100vh; transition: filter 0.8s ease, background 0.5s;
+            padding-bottom: 50px; -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ANTI-DOPAMINE MODES */
+        body.grayscale-mode { filter: grayscale(100%) contrast(1.1); }
+        body.HIGH_STRESS { background-color: #ffebee; }
+        .hidden { display: none !important; }
+
+        /* Navigation */
+        .tab-bar { 
+            width: 100%; max-width: 500px; display: flex; background: white; 
+            position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .tab { 
+            padding: 18px; cursor: pointer; flex: 1; text-align: center; 
+            font-weight: bold; color: #aaa; border-bottom: 3px solid transparent;
+        }
+        .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+        /* Cards */
+        .container { width: 100%; max-width: 450px; padding: 15px; box-sizing: border-box; }
+        .card { 
+            background: white; padding: 20px; border-radius: 20px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 15px; text-align: center;
+        }
+        .settings-card { 
+            background: #e3f2fd; padding: 12px; border-radius: 12px; 
+            margin-bottom: 15px; font-size: 12px; text-align: left; border: 1px solid #bbdefb;
+        }
+
+        /* Inputs & Buttons */
+        input, textarea { 
+            width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; 
+            border-radius: 12px; font-size: 16px; box-sizing: border-box;
+        }
+        button { 
+            width: 100%; padding: 16px; border: none; border-radius: 14px; 
+            font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 10px;
+        }
+        .btn-main { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-buddy { background: var(--buddy-color); color: white; }
+        .btn-disabled { background: #ccc !important; cursor: not-allowed; opacity: 0.6; }
+
+        /* History */
+        .history-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; text-align: left;}
+
+        /* Animation */
+        .bubble { 
+            width: 70px; height: 70px; background: rgba(33, 150, 243, 0.2); 
+            border-radius: 50%; margin: 15px auto; display: flex; align-items: center; 
+            justify-content: center; animation: breathe 4s infinite ease-in-out;
+        }
+        @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+    </style>
+</head>
+<body>
+
+    <audio id="success-sound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" preload="auto"></audio>
+
+    <div class="tab-bar">
+        <div class="tab active" onclick="switchTab('dashboard', this)">🏠 Home</div>
+        <div class="tab" onclick="switchTab('social', this)">👥 Social</div>
+        <div class="tab" onclick="switchTab('rewards', this)">🎟️ Perks</div>
+    </div>
+
+    <div id="dashboard-screen" class="container">
+        <div class="settings-card">
+            <b>⚙️ PRO CONFIG</b> | Wage: $<input type="number" id="hourly-wage" value="25" onchange="saveAppData()" style="width:45px; border:none; background:transparent; font-weight:bold; color:var(--primary); font-size:12px;">
+        </div>
+
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; color: #888;">
+                <span>🎯 GOAL: NEW MACBOOK</span>
+                <span id="goal-text">$0 / $1200</span>
+            </div>
+            <div style="width:100%; background:#eee; height:10px; border-radius:5px; margin-top:5px; overflow:hidden;">
+                <div id="goal-progress" style="height:100%; background:var(--success); width:0%; transition: 1s;"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="margin:0 0 10px 0;">🛒 Purchase Check</h3>
+            <input type="text" id="merchant" placeholder="Store name...">
+            <input type="number" id="amount" placeholder="Price ($)">
+            <button id="main-action-btn" class="btn-main" onclick="runFrictionTest()">Calculate Real Cost</button>
+
+            <div id="intervention-zone" class="hidden">
+                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
+                    <div id="cost-analysis-box" style="background:#fff3e0; padding:12px; border-radius:12px; font-size:13px; margin-bottom:15px; color:#e65100; text-align:left;"></div>
+                    <div class="bubble">Breathe</div>
+                    <textarea id="journal-entry" placeholder="Why do I NOT need this today?"></textarea>
+                    <button id="buddy-btn" class="btn-buddy" onclick="alertBuddy()">💬 Alert Sarah J. (Unlocks Bypass)</button>
+                    <button class="btn-success" onclick="resolve('Save')">Log & Save Money</button>
+                    <button id="bypass-btn" class="btn-disabled" onclick="resolve('Spend')" disabled style="font-size:11px; background:#90a4ae; color:white;">⚠️ Emergency Bypass (Locked)</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="text-align:left;">
+            <h4 style="margin:0 0 10px 0;">🏆 Recent Victories</h4>
+            <div id="history-log"><div class="history-item"><i>No savings logged yet.</i></div></div>
+        </div>
+    </div>
+
+    <div id="social-screen" class="container hidden">
+        <div class="card">
+            <h3>👥 Buddy Feed</h3>
+            <div id="social-feed">
+                <div style="text-align:left; padding:10px; background:#f9f9f9; border-radius:10px; margin-bottom:10px; font-size:13px;">
+                    <b>Sarah J.</b>: "Watching your back! Let's hit that MacBook goal."
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="rewards-screen" class="container hidden">
+        <div class="card"><h3>🎟️ Your Perks</h3><p id="reward-status">Locked until your next $100 save.</p></div>
+    </div>
+
+    <script>
+        // LOAD DATA FROM STORAGE OR INITIALIZE
+        let state = JSON.parse(localStorage.getItem('mindfulSpendData')) || {
+            totalSaved: 420.00,
+            goal: 1200.00,
+            history: [],
+            wage: 25,
+            buddyAlerted: false
+        };
+
+        function saveAppData() {
+            state.wage = document.getElementById('hourly-wage').value;
+            localStorage.setItem('mindfulSpendData', JSON.stringify(state));
+        }
+
+        function switchTab(tabId, el) {
+            document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabId + '-screen').classList.remove('hidden');
+            el.classList.add('active');
+        }
+
+        function runFrictionTest() {
+            const amt = parseFloat(document.getElementById('amount').value);
+            const wage = parseFloat(document.getElementById('hourly-wage').value) || 25;
+            if (!amt) return;
+
+            const hours = (amt / wage).toFixed(1);
+            const futureVal = (amt * Math.pow(1.07, 10)).toFixed(0);
+
+            if (amt >= 100) {
+                document.body.classList.add('HIGH_STRESS', 'grayscale-mode');
+                document.getElementById('intervention-zone').classList.remove('hidden');
+                document.getElementById('cost-analysis-box').innerHTML = 
+                    `⏳ <b>Life Cost:</b> ${hours} hours of work<br>` +
+                    `📈 <b>Future Loss:</b> $${futureVal} if invested (10yrs)`;
+            } else {
+                alert(`Low impact. This costs ${hours} work hours.`);
+            }
+        }
+
+        function alertBuddy() {
+            state.buddyAlerted = true;
+            const bBtn = document.getElementById('buddy-btn');
+            bBtn.innerHTML = "✅ Sarah J. has been notified!";
+            bBtn.style.background = "#4CAF50";
+            const bypass = document.getElementById('bypass-btn');
+            bypass.disabled = false;
+            bypass.classList.remove('btn-disabled');
+            bypass.style.background = "#f44336";
+            bypass.innerText = "⚠️ Emergency Bypass (Unlocked)";
+        }
+
+        function resolve(choice) {
+            const amt = parseFloat(document.getElementById('amount').value);
+            const shop = document.getElementById('merchant').value || "Store";
+
+            if (choice === 'Save') {
+                if (!document.getElementById('journal-entry').value) return alert("Write your reflection first!");
+                state.totalSaved += amt;
+                state.history.unshift({ shop, amt, date: new Date().toLocaleDateString() });
+
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                document.getElementById('success-sound').play();
+
+                const feed = document.getElementById('social-feed');
+                feed.innerHTML = `<div style="padding:10px; background:#e8f5e9; border-radius:10px; margin-bottom:10px; font-size:13px; text-align:left;">
+                    <b>YOU</b> saved $${amt} at ${shop}! 🚀</div>` + feed.innerHTML;
+            }
+
+            saveAppData();
+            updateView();
+            resetUI();
+        }
+
+        function updateView() {
+            // Update Goal UI
+            const perc = (state.totalSaved / state.goal) * 100;
+            document.getElementById('goal-progress').style.width = Math.min(perc, 100) + "%";
+            document.getElementById('goal-text').innerText = `$${state.totalSaved.toFixed(0)} / $${state.goal}`;
+            document.getElementById('hourly-wage').value = state.wage;
+
+            // Update History UI
+            const log = document.getElementById('history-log');
+            if (state.history.length > 0) {
+                log.innerHTML = state.history.map(item => `
+                    <div class="history-item">
+                        <span><b>${item.shop}</b></span>
+                        <span style="color:var(--success)">+$${item.amt} saved</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function resetUI() {
+            document.body.classList.remove('HIGH_STRESS', 'grayscale-mode');
+            document.getElementById('intervention-zone').classList.add('hidden');
+            document.getElementById('amount').value = "";
+            document.getElementById('merchant').value = "";
+            document.getElementById('journal-entry').value = "";
+            state.buddyAlerted = false;
+            
+            const bBtn = document.getElementById('buddy-btn');
+            bBtn.innerHTML = "💬 Alert Sarah J. (Unlock Bypass)";
+            bBtn.style.background = "var(--buddy-color)";
+            const bypass = document.getElementById('bypass-btn');
+            bypass.disabled = true;
+            bypass.classList.add('btn-disabled');
+            bypass.style.background = "#90a4ae";
+            bypass.innerText = "⚠️ Emergency Bypass (Locked)";
+        }
+
+        window.onload = updateView;
+    </script>
+</body>
+</html>
