@@ -19,7 +19,7 @@
 
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            background-color: var(--bg-soft); margin: 0; padding-bottom: 100px;
+            background-color: var(--bg-soft); margin: 0; padding-bottom: 110px;
             transition: filter 0.6s ease;
         }
 
@@ -33,8 +33,7 @@
         }
         .runway-count { font-size: 64px; font-weight: 900; display: block; line-height: 1; }
         .runway-unit { font-size: 14px; opacity: 0.8; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; }
-        .runway-subtext { font-size: 11px; margin-top: 15px; opacity: 0.6; font-style: italic; }
-
+        
         .card { 
             background: white; margin: 15px; padding: 22px; border-radius: 28px; 
             box-shadow: 0 4px 20px rgba(0,0,0,0.06); position: relative;
@@ -42,74 +41,82 @@
 
         .overlap-top { margin-top: -35px !important; z-index: 10; }
 
-        /* 2. Emotional Mood Engine */
-        .mood-box { display: flex; gap: 12px; overflow-x: auto; padding: 10px 0; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-        .mood-btn { 
-            flex: 0 0 auto; padding: 12px 20px; border-radius: 25px; background: #f0f2f5; 
-            border: 2px solid transparent; font-size: 13px; cursor: pointer; transition: 0.3s;
+        /* Action Buttons */
+        .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0 15px; }
+        .action-btn { 
+            padding: 15px 5px; border-radius: 18px; border: none; font-weight: bold; 
+            font-size: 12px; cursor: pointer; text-align: center; color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
-        .mood-btn.active { background: var(--primary-saffron); color: white; border-color: #fb8c00; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(255,153,51,0.3); }
 
-        /* 3. Wealth Map (Indian Context) */
-        .asset-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #f0f0f0; }
-        .asset-info { font-size: 14px; display: flex; align-items: center; gap: 10px; font-weight: 500; }
-        .asset-val { font-family: 'Courier New', monospace; font-weight: 700; color: var(--trust-navy); }
+        /* Module Content */
+        #module-container { display: none; border: 2px solid var(--trust-navy); }
+        .module-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .close-btn { background: #eee; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; }
+
+        /* Standard Components */
+        .mood-box { display: flex; gap: 12px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
+        .mood-btn { flex: 0 0 auto; padding: 12px 20px; border-radius: 25px; background: #f0f2f5; border: 2px solid transparent; font-size: 13px; cursor: pointer; transition: 0.3s; }
+        .mood-btn.active { background: var(--primary-saffron); color: white; }
+
+        .asset-row { display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #f0f0f0; }
+        .asset-val { font-weight: 700; color: var(--trust-navy); }
         .gold-tag { border-left: 5px solid #FFD700; padding-left: 12px; margin-left: -12px; }
 
-        /* 4. Pulse Check (Impulse Control) */
         input { width: 100%; padding: 16px; margin: 10px 0; border: 2px solid #eee; border-radius: 16px; font-size: 16px; box-sizing: border-box; }
-        .btn-check { width: 100%; padding: 18px; background: var(--trust-navy); color: white; border: none; border-radius: 18px; font-weight: 700; font-size: 16px; cursor: pointer; }
+        .btn-check { width: 100%; padding: 18px; background: var(--trust-navy); color: white; border: none; border-radius: 18px; font-weight: 700; }
         
-        .nudge-overlay { 
-            background: #fff9c4; border: 2px solid var(--primary-saffron); padding: 20px; 
-            border-radius: 22px; margin-top: 20px; display: none;
-        }
+        .nudge-overlay { background: #fff9c4; border: 2px solid var(--primary-saffron); padding: 20px; border-radius: 22px; margin-top: 20px; display: none; }
 
-        /* Family Auditor Tile */
-        .family-pill { background: #e3f2fd; display: flex; align-items: center; gap: 15px; padding: 15px; border-radius: 20px; margin-top: 15px; }
-        .initials { width: 45px; height: 45px; background: var(--trust-navy); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; }
-
-        /* Navigation */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; border-top: 1px solid #eee; padding: 12px 0; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); }
-        .nav-btn { flex: 1; text-align: center; font-size: 11px; color: #aaa; text-decoration: none; font-weight: 600; }
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; border-top: 1px solid #eee; padding: 12px 0; z-index: 1000; }
+        .nav-btn { flex: 1; text-align: center; font-size: 11px; color: #aaa; text-decoration: none; font-weight: 600; cursor: pointer; }
         .nav-btn.active { color: var(--trust-navy); }
     </style>
 </head>
 <body>
 
-    <div class="runway-header">
+    <div class="runway-header" id="home-view">
         <span class="runway-unit">Family Safety Runway</span>
         <span class="runway-count" id="runway-display">164</span>
         <span class="runway-unit">Days of Freedom</span>
-        <p class="runway-subtext">Calculated on ₹1,500 daily household burn rate</p>
+        <p style="font-size: 11px; margin-top: 15px; opacity: 0.6;">Avg. Daily Burn: ₹1,500</p>
     </div>
 
-    <div class="card overlap-top">
+    <div class="action-grid overlap-top">
+        <button class="action-btn" style="background: var(--growth-green);" onclick="openModule('invest')">📈 Invest</button>
+        <button class="action-btn" style="background: var(--trust-navy);" onclick="openModule('pay')">💸 Pay UPI</button>
+        <button class="action-btn" style="background: #5c6bc0;" onclick="openModule('buddy')">💬 Buddies</button>
+    </div>
+
+    <div id="module-container" class="card">
+        <div class="module-header">
+            <h4 id="module-title" style="margin:0;">Module</h4>
+            <button class="close-btn" onclick="closeModule()">✕</button>
+        </div>
+        <div id="module-body"></div>
+    </div>
+
+    <div class="card" id="mood-section">
         <h5 style="margin: 0 0 12px 0; color: #444;">Arjun, how are you feeling today?</h5>
         <div class="mood-box">
             <div class="mood-btn active" onclick="updateMood('Calm', this)">😌 Shanti</div>
-            <div class="mood-btn" onclick="updateMood('Stressed', this)">😰 Overwhelmed</div>
-            <div class="mood-btn" onclick="updateMood('Excited', this)">🤑 Salary Day!</div>
+            <div class="mood-btn" onclick="updateMood('Stressed', this)">😰 Stressed</div>
+            <div class="mood-btn" onclick="updateMood('Excited', this)">🤑 Salary!</div>
             <div class="mood-btn" onclick="updateMood('Bored', this)">🥱 Bored</div>
         </div>
     </div>
 
-    <div class="card">
+    <div class="card" id="pulse-section">
         <h3 style="margin: 0 0 5px 0;">🛒 Pulse Check</h3>
-        <p style="font-size: 12px; color: #777; margin-bottom: 15px;">Pause. Look at the impact before you scan.</p>
-        
-        <input type="text" id="itemName" placeholder="What's the treat? (e.g., iPhone Case, Swiggy)">
+        <p style="font-size: 12px; color: #777; margin-bottom: 15px;">Enter details to see the life-impact.</p>
+        <input type="text" id="itemName" placeholder="Item Name">
         <input type="number" id="itemPrice" placeholder="Price (₹)">
-        <button class="btn-check" onclick="processNudge()">Analyze Life-Cost</button>
+        <button class="btn-check" onclick="processNudge()">Analyze Impact</button>
 
         <div id="nudgeSection" class="nudge-overlay">
-            <h4 style="margin: 0; color: var(--danger-red);">⚠️ "Log Kehenge" Logic Filter</h4>
-            <p id="nudgeText" style="font-size: 14px; color: #333; line-height: 1.5; margin: 15px 0;"></p>
-            
-            <div style="background: white; padding: 15px; border-radius: 12px; font-size: 12px; margin-bottom: 15px; border-left: 4px solid var(--primary-saffron);">
-                <b>Think:</b> Is this spend moving you closer to your "Home Downpayment" or just a 15-minute thrill?
-            </div>
-
+            <h4 style="margin: 0; color: var(--danger-red);">⚠️ Emotional Guardrail</h4>
+            <p id="nudgeText" style="font-size: 14px; color: #333; margin: 15px 0;"></p>
             <div style="display: flex; gap: 10px;">
                 <button onclick="resolve('save')" style="background: var(--growth-green); color: white; border: none; padding: 15px; border-radius: 12px; flex: 1; font-weight: bold;">Invest Instead</button>
                 <button onclick="resolve('spend')" style="background: #f5f5f5; color: #666; border: none; padding: 15px; border-radius: 12px; flex: 1; font-weight: bold;">I need this</button>
@@ -117,48 +124,19 @@
         </div>
     </div>
 
-    <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h4 style="margin: 0;">Family Wealth Map</h4>
-            <span style="font-size: 11px; background: #e8f5e9; color: var(--growth-green); padding: 4px 10px; border-radius: 10px; font-weight: bold;">UP ₹4,200</span>
-        </div>
-
-        <div style="height: 160px; margin-bottom: 15px;">
-            <canvas id="wealthChart"></canvas>
-        </div>
-
-        <div class="asset-row">
-            <div class="asset-info">🏦 SBI Savings</div>
-            <div class="asset-val">₹65,200</div>
-        </div>
-        <div class="asset-row gold-tag">
-            <div class="asset-info">🟡 Physical Gold & SGB</div>
-            <div class="asset-val">₹39,300</div>
-        </div>
-        <div class="asset-row">
-            <div class="asset-info">📈 SIP (Large Cap)</div>
-            <div class="asset-val">₹2,80,000</div>
-        </div>
-
-        <div class="family-pill">
-            <div class="initials">P</div>
-            <div style="flex-grow: 1;">
-                <div style="font-size: 13px; font-weight: bold;">Auditor: Papa</div>
-                <div style="font-size: 11px; color: #555;">Visibility: Safety Net & Goals only</div>
-            </div>
-            <div style="color: var(--growth-green); font-weight: bold;">ACTIVE</div>
-        </div>
-
-        <button style="background: none; border: 2px dashed #ddd; color: #999; width: 100%; padding: 12px; border-radius: 15px; margin-top: 20px; font-size: 12px; font-weight: 600;">
-            + Connect Bank via AA Framework
-        </button>
+    <div class="card" id="wealth-section">
+        <h4 style="margin: 0 0 15px 0;">Family Wealth Map</h4>
+        <div style="height: 160px; margin-bottom: 15px;"><canvas id="wealthChart"></canvas></div>
+        <div class="asset-row"><div class="asset-info">🏦 Bank Savings</div><div class="asset-val">₹65,200</div></div>
+        <div class="asset-row gold-tag"><div class="asset-info">🟡 Gold Assets</div><div class="asset-val">₹39,300</div></div>
+        <div class="asset-row"><div class="asset-info">📈 SIPs</div><div class="asset-val">₹2,80,000</div></div>
     </div>
 
     <div class="bottom-nav">
-        <a href="#" class="nav-btn active">🏠 Sarthi</a>
-        <a href="#" class="nav-btn">📊 Wealth</a>
-        <a href="#" class="nav-btn">🛡️ Shield</a>
-        <a href="#" class="nav-btn">👥 Family</a>
+        <div class="nav-btn active" onclick="showView('home')">🏠 Sarthi</div>
+        <div class="nav-btn" onclick="showView('wealth')">📊 Wealth</div>
+        <div class="nav-btn" onclick="showView('shield')">🛡️ Shield</div>
+        <div class="nav-btn" onclick="showView('family')">👥 Family</div>
     </div>
 
     <script>
@@ -166,69 +144,85 @@
         const HOURLY_RATE = 450;
         let totalSavings = 384500;
 
-        // Initialize Runway
-        document.getElementById('runway-display').innerText = Math.floor(totalSavings / DAILY_BURN);
+        // MODULE ENGINE
+        function openModule(type) {
+            const container = document.getElementById('module-container');
+            const body = document.getElementById('module-body');
+            const title = document.getElementById('module-title');
+            container.style.display = 'block';
 
+            if(type === 'invest') {
+                title.innerText = "Where to Invest?";
+                let rec = totalSavings/DAILY_BURN > 90 ? "Nifty 50 Index Fund" : "High-yield Savings FD";
+                body.innerHTML = `<p>Based on your <b>${Math.floor(totalSavings/DAILY_BURN)} day runway</b>, we suggest:</p>
+                                  <div style="background:#e8f5e9; padding:15px; border-radius:15px; font-weight:bold; color:var(--growth-green);">🚀 ${rec}</div>
+                                  <p style="font-size:11px; color:#666; margin-top:10px;">This helps you reach your 'Home Fund' goal faster.</p>`;
+            } else if(type === 'pay') {
+                title.innerText = "UPI Scanner (Safe Mode)";
+                body.innerHTML = `<div style="height:150px; background:#000; border-radius:15px; display:flex; align-items:center; justify-content:center; color:white; font-size:12px;">
+                                  [📷 Camera Access Simulation]</div>
+                                  <p style="font-size:12px; text-align:center; margin-top:10px;">Emotional filter will trigger automatically on Scan.</p>`;
+            } else if(type === 'buddy') {
+                title.innerText = "Buddy Network";
+                body.innerHTML = `<div style="font-size:13px; color:#444;">
+                                  <div style="padding:10px; border-bottom:1px solid #eee;">🔥 <b>Rahul</b> just increased his runway to 100 days!</div>
+                                  <div style="padding:10px; border-bottom:1px solid #eee;">✅ <b>Priya</b> completed her 'Emergency Fund' goal.</div>
+                                  <div style="padding:10px;">💬 <i>"How did you manage the car expense?"</i> - Simran</div>
+                                  </div><input type="text" placeholder="Post a win to your buddies...">`;
+            }
+            container.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function closeModule() { document.getElementById('module-container').style.display = 'none'; }
+
+        // MOOD & RUNWAY LOGIC
         function updateMood(mood, el) {
             document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
             el.classList.add('active');
-            if(mood === 'Stressed') {
-                document.body.classList.add('shield-mode');
-                alert("Shield Mode ON: Logic filters will be stricter today to prevent stress-spending.");
-            } else {
-                document.body.classList.remove('shield-mode');
-            }
+            document.body.classList.toggle('shield-mode', mood === 'Stressed');
         }
 
         function processNudge() {
             const price = document.getElementById('itemPrice').value;
             const name = document.getElementById('itemName').value;
             if(!price) return;
-
-            const daysLost = (price / DAILY_BURN).toFixed(1);
-            const hoursWorked = (price / HOURLY_RATE).toFixed(1);
-
-            const nudgeBox = document.getElementById('nudgeSection');
-            const nudgeText = document.getElementById('nudgeText');
-
-            nudgeText.innerHTML = `Arjun, this <b>${name}</b> costs you <b>${hoursWorked} hours</b> of labor. 🛋️<br><br>Buying this kills <b>${daysLost} days</b> of your Family Safety Runway.`;
-            
-            nudgeBox.style.display = 'block';
-            nudgeBox.scrollIntoView({ behavior: 'smooth' });
+            const days = (price / DAILY_BURN).toFixed(1);
+            document.getElementById('nudgeText').innerHTML = `This <b>${name}</b> will cost <b>${days} days</b> of your family's freedom. Is it worth the trade?`;
+            document.getElementById('nudgeSection').style.display = 'block';
         }
 
         function resolve(choice) {
-            if(choice === 'save') {
-                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-                alert("Great choice! Redirecting funds to your 'Parents' Health' pot.");
-            }
+            if(choice === 'save') confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
             document.getElementById('nudgeSection').style.display = 'none';
-            document.getElementById('itemPrice').value = '';
-            document.getElementById('itemName').value = '';
         }
 
-        // Initialize Wealth Chart
+        // NAVIGATION SIMULATION
+        function showView(view) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            alert("Switching to " + view.toUpperCase() + " view. In a real app, this would change the screen content.");
+        }
+
+        // CHART INITIALIZATION
         const ctx = document.getElementById('wealthChart').getContext('2d');
         new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: ['Cash', 'Mutual Funds', 'Gold'],
+                labels: ['Cash', 'SIPs', 'Gold'],
                 datasets: [{
                     data: [65200, 280000, 39300],
                     backgroundColor: ['#2196F3', '#138808', '#FFCC00'],
-                    hoverOffset: 10,
                     borderWidth: 0
                 }]
             },
             options: {
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'right', labels: { boxWidth: 15, font: { size: 11, weight: '600' } } }
-                },
+                plugins: { legend: { position: 'right' } },
                 cutout: '70%'
             }
         });
     </script>
 </body>
 </html>
+        
    
