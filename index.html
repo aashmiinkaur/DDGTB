@@ -3,226 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sarthi 2.0: The Indian Money Companion</title>
+    <title>Sarthi: Your Money Buddy</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
     <style>
         :root {
-            --primary-saffron: #FF9933; 
-            --growth-green: #138808; 
-            --trust-navy: #000080; 
-            --bg-soft: #f4f7fa;
-            --danger-red: #d32f2f;
+            --buddy-indigo: #6366f1;
+            --safe-green: #22c55e;
+            --warn-yellow: #f59e0b;
+            --danger-red: #ef4444;
+            --bg-slate: #f8fafc;
         }
 
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            background-color: var(--bg-soft); margin: 0; padding-bottom: 110px;
-            transition: filter 0.6s ease;
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            background-color: var(--bg-slate); margin: 0; padding-bottom: 120px;
+            color: #1e293b; transition: all 0.4s ease;
         }
 
-        body.shield-mode { filter: grayscale(100%) contrast(1.1); }
-
-        /* 1. Family Runway Header */
-        .runway-header { 
-            background: linear-gradient(135deg, var(--trust-navy), #1a237e); 
-            color: white; padding: 40px 20px 50px 20px; border-radius: 0 0 40px 40px;
-            text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        /* 1. The Buddy Header (Visual Status) */
+        .buddy-header { 
+            background: var(--buddy-indigo); color: white; 
+            padding: 40px 20px 60px; text-align: center;
+            border-radius: 0 0 40px 40px; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2);
         }
-        .runway-count { font-size: 64px; font-weight: 900; display: block; line-height: 1; }
-        .runway-unit { font-size: 14px; opacity: 0.8; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; }
-        
+        .buddy-avatar {
+            width: 80px; height: 80px; background: white; border-radius: 50%;
+            margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;
+            font-size: 40px; border: 4px solid var(--safe-green);
+        }
+        .buddy-status { font-size: 22px; font-weight: 700; margin: 0; }
+        .buddy-sub { font-size: 14px; opacity: 0.8; margin-top: 5px; }
+
+        /* 2. Simple Metric Cards */
         .card { 
-            background: white; margin: 15px; padding: 22px; border-radius: 28px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.06); position: relative;
+            background: white; margin: -30px 20px 20px; padding: 25px; 
+            border-radius: 28px; box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            position: relative;
         }
 
-        .overlap-top { margin-top: -35px !important; z-index: 10; }
+        .safe-spend-box { text-align: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 20px; margin-bottom: 20px; }
+        .amount { font-size: 40px; font-weight: 800; color: var(--buddy-indigo); display: block; }
+        .label { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
 
-        /* Action Buttons */
-        .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0 15px; }
-        .action-btn { 
-            padding: 15px 5px; border-radius: 18px; border: none; font-weight: bold; 
-            font-size: 12px; cursor: pointer; text-align: center; color: white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        .bucket-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .bucket { background: #f1f5f9; padding: 15px; border-radius: 20px; text-align: center; }
+        .bucket b { display: block; font-size: 16px; color: var(--buddy-indigo); }
+        .bucket span { font-size: 11px; color: #64748b; }
+
+        /* 3. The "Buddy" Chat Input */
+        .chat-dock {
+            position: fixed; bottom: 20px; left: 15px; right: 15px;
+            background: white; border-radius: 50px; display: flex;
+            align-items: center; padding: 8px 10px;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;
+            z-index: 1000;
+        }
+        .chat-dock input {
+            flex: 1; border: none; padding: 12px 15px; font-size: 16px;
+            outline: none; background: transparent;
+        }
+        .chat-dock button {
+            background: var(--buddy-indigo); color: white; border: none;
+            width: 45px; height: 45px; border-radius: 50%; font-weight: bold;
+            cursor: pointer; transition: transform 0.2s;
+        }
+        .chat-dock button:active { transform: scale(0.9); }
+
+        /* Privacy & Settings */
+        .privacy-pill { 
+            display: inline-block; background: #e0e7ff; color: #4338ca; 
+            padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
+            margin-top: 15px;
         }
 
-        /* Module Content */
-        #module-container { display: none; border: 2px solid var(--trust-navy); }
-        .module-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .close-btn { background: #eee; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; }
+        /* 4. Goals Section */
+        .goal-card { background: #fff; margin: 0 20px 20px; padding: 20px; border-radius: 24px; display: flex; align-items: center; gap: 15px; border: 1px solid #edf2f7; }
+        .goal-icon { font-size: 24px; padding: 12px; background: #fef3c7; border-radius: 15px; }
+        .progress-bar { flex: 1; height: 8px; background: #eee; border-radius: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--warn-yellow); width: 65%; }
 
-        /* Standard Components */
-        .mood-box { display: flex; gap: 12px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
-        .mood-btn { flex: 0 0 auto; padding: 12px 20px; border-radius: 25px; background: #f0f2f5; border: 2px solid transparent; font-size: 13px; cursor: pointer; transition: 0.3s; }
-        .mood-btn.active { background: var(--primary-saffron); color: white; }
-
-        .asset-row { display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #f0f0f0; }
-        .asset-val { font-weight: 700; color: var(--trust-navy); }
-        .gold-tag { border-left: 5px solid #FFD700; padding-left: 12px; margin-left: -12px; }
-
-        input { width: 100%; padding: 16px; margin: 10px 0; border: 2px solid #eee; border-radius: 16px; font-size: 16px; box-sizing: border-box; }
-        .btn-check { width: 100%; padding: 18px; background: var(--trust-navy); color: white; border: none; border-radius: 18px; font-weight: 700; }
-        
-        .nudge-overlay { background: #fff9c4; border: 2px solid var(--primary-saffron); padding: 20px; border-radius: 22px; margin-top: 20px; display: none; }
-
-        /* Bottom Nav */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; border-top: 1px solid #eee; padding: 12px 0; z-index: 1000; }
-        .nav-btn { flex: 1; text-align: center; font-size: 11px; color: #aaa; text-decoration: none; font-weight: 600; cursor: pointer; }
-        .nav-btn.active { color: var(--trust-navy); }
+        /* Gray mode for stress */
+        body.stress-mode { filter: grayscale(100%); }
     </style>
 </head>
 <body>
 
-    <div class="runway-header" id="home-view">
-        <span class="runway-unit">Family Safety Runway</span>
-        <span class="runway-count" id="runway-display">164</span>
-        <span class="runway-unit">Days of Freedom</span>
-        <p style="font-size: 11px; margin-top: 15px; opacity: 0.6;">Avg. Daily Burn: ₹1,500</p>
+    <div class="buddy-header">
+        <div class="buddy-avatar" id="buddy-face">😌</div>
+        <h2 class="buddy-status" id="buddy-msg">"You're doing great, Arjun!"</h2>
+        <div class="buddy-sub">Your Family Shield is strong for 164 days.</div>
     </div>
 
-    <div class="action-grid overlap-top">
-        <button class="action-btn" style="background: var(--growth-green);" onclick="openModule('invest')">📈 Invest</button>
-        <button class="action-btn" style="background: var(--trust-navy);" onclick="openModule('pay')">💸 Pay UPI</button>
-        <button class="action-btn" style="background: #5c6bc0;" onclick="openModule('buddy')">💬 Buddies</button>
-    </div>
-
-    <div id="module-container" class="card">
-        <div class="module-header">
-            <h4 id="module-title" style="margin:0;">Module</h4>
-            <button class="close-btn" onclick="closeModule()">✕</button>
+    <div class="card">
+        <div class="safe-spend-box">
+            <span class="label">Guilt-Free Spending Today</span>
+            <span class="amount" id="safe-amt">₹2,450</span>
         </div>
-        <div id="module-body"></div>
-    </div>
-
-    <div class="card" id="mood-section">
-        <h5 style="margin: 0 0 12px 0; color: #444;">Arjun, how are you feeling today?</h5>
-        <div class="mood-box">
-            <div class="mood-btn active" onclick="updateMood('Calm', this)">😌 Shanti</div>
-            <div class="mood-btn" onclick="updateMood('Stressed', this)">😰 Stressed</div>
-            <div class="mood-btn" onclick="updateMood('Excited', this)">🤑 Salary!</div>
-            <div class="mood-btn" onclick="updateMood('Bored', this)">🥱 Bored</div>
-        </div>
-    </div>
-
-    <div class="card" id="pulse-section">
-        <h3 style="margin: 0 0 5px 0;">🛒 Pulse Check</h3>
-        <p style="font-size: 12px; color: #777; margin-bottom: 15px;">Enter details to see the life-impact.</p>
-        <input type="text" id="itemName" placeholder="Item Name">
-        <input type="number" id="itemPrice" placeholder="Price (₹)">
-        <button class="btn-check" onclick="processNudge()">Analyze Impact</button>
-
-        <div id="nudgeSection" class="nudge-overlay">
-            <h4 style="margin: 0; color: var(--danger-red);">⚠️ Emotional Guardrail</h4>
-            <p id="nudgeText" style="font-size: 14px; color: #333; margin: 15px 0;"></p>
-            <div style="display: flex; gap: 10px;">
-                <button onclick="resolve('save')" style="background: var(--growth-green); color: white; border: none; padding: 15px; border-radius: 12px; flex: 1; font-weight: bold;">Invest Instead</button>
-                <button onclick="resolve('spend')" style="background: #f5f5f5; color: #666; border: none; padding: 15px; border-radius: 12px; flex: 1; font-weight: bold;">I need this</button>
+        
+        <div class="bucket-grid">
+            <div class="bucket">
+                <span>🛡️ Shield</span>
+                <b>164 Days</b>
+            </div>
+            <div class="bucket">
+                <span>🟡 Gold Wealth</span>
+                <b>₹39,300</b>
             </div>
         </div>
+
+        <center>
+            <div class="privacy-pill">🔒 Private: Only you see what you buy</div>
+        </center>
     </div>
 
-    <div class="card" id="wealth-section">
-        <h4 style="margin: 0 0 15px 0;">Family Wealth Map</h4>
-        <div style="height: 160px; margin-bottom: 15px;"><canvas id="wealthChart"></canvas></div>
-        <div class="asset-row"><div class="asset-info">🏦 Bank Savings</div><div class="asset-val">₹65,200</div></div>
-        <div class="asset-row gold-tag"><div class="asset-info">🟡 Gold Assets</div><div class="asset-val">₹39,300</div></div>
-        <div class="asset-row"><div class="asset-info">📈 SIPs</div><div class="asset-val">₹2,80,000</div></div>
+    <div class="goal-card">
+        <div class="goal-icon">🏠</div>
+        <div style="flex:1">
+            <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px;">
+                <b>Home Fund</b>
+                <span>65%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill"></div></div>
+        </div>
     </div>
 
-    <div class="bottom-nav">
-        <div class="nav-btn active" onclick="showView('home')">🏠 Sarthi</div>
-        <div class="nav-btn" onclick="showView('wealth')">📊 Wealth</div>
-        <div class="nav-btn" onclick="showView('shield')">🛡️ Shield</div>
-        <div class="nav-btn" onclick="showView('family')">👥 Family</div>
+    <div style="padding: 0 25px; margin-bottom: 30px;">
+        <h4 style="margin: 0 0 8px 0; font-size: 14px; color: #64748b;">Buddy's Advice 💡</h4>
+        <p style="margin:0; font-size: 14px; line-height: 1.5; color: #475569;">
+            "Arjun, if you skip one Zomato order today, we can hit your <b>Home Fund</b> target 4 days early! Just a thought."
+        </p>
+    </div>
+
+    <div class="chat-dock">
+        <input type="text" id="userInput" placeholder="Ask Buddy: 'Can I buy shoes?'">
+        <button onclick="talkToBuddy()">Go</button>
     </div>
 
     <script>
-        const DAILY_BURN = 1500;
-        const HOURLY_RATE = 450;
-        let totalSavings = 384500;
+        const DAILY_ALLOWANCE = 2450;
+        const SHIELD_DAYS = 164;
 
-        // MODULE ENGINE
-        function openModule(type) {
-            const container = document.getElementById('module-container');
-            const body = document.getElementById('module-body');
-            const title = document.getElementById('module-title');
-            container.style.display = 'block';
+        function talkToBuddy() {
+            const text = document.getElementById('userInput').value.toLowerCase();
+            const face = document.getElementById('buddy-face');
+            const msg = document.getElementById('buddy-msg');
+            const safeAmt = document.getElementById('safe-amt');
 
-            if(type === 'invest') {
-                title.innerText = "Where to Invest?";
-                let rec = totalSavings/DAILY_BURN > 90 ? "Nifty 50 Index Fund" : "High-yield Savings FD";
-                body.innerHTML = `<p>Based on your <b>${Math.floor(totalSavings/DAILY_BURN)} day runway</b>, we suggest:</p>
-                                  <div style="background:#e8f5e9; padding:15px; border-radius:15px; font-weight:bold; color:var(--growth-green);">🚀 ${rec}</div>
-                                  <p style="font-size:11px; color:#666; margin-top:10px;">This helps you reach your 'Home Fund' goal faster.</p>`;
-            } else if(type === 'pay') {
-                title.innerText = "UPI Scanner (Safe Mode)";
-                body.innerHTML = `<div style="height:150px; background:#000; border-radius:15px; display:flex; align-items:center; justify-content:center; color:white; font-size:12px;">
-                                  [📷 Camera Access Simulation]</div>
-                                  <p style="font-size:12px; text-align:center; margin-top:10px;">Emotional filter will trigger automatically on Scan.</p>`;
-            } else if(type === 'buddy') {
-                title.innerText = "Buddy Network";
-                body.innerHTML = `<div style="font-size:13px; color:#444;">
-                                  <div style="padding:10px; border-bottom:1px solid #eee;">🔥 <b>Rahul</b> just increased his runway to 100 days!</div>
-                                  <div style="padding:10px; border-bottom:1px solid #eee;">✅ <b>Priya</b> completed her 'Emergency Fund' goal.</div>
-                                  <div style="padding:10px;">💬 <i>"How did you manage the car expense?"</i> - Simran</div>
-                                  </div><input type="text" placeholder="Post a win to your buddies...">`;
+            if (!text) return;
+
+            // Simple Buddy Logic
+            if (text.includes("buy") || text.includes("cost") || text.includes("price")) {
+                face.innerText = "🤔";
+                msg.innerText = "Let's check the math...";
+                setTimeout(() => {
+                    face.innerText = "🧐";
+                    alert("Buddy Says: 'Nice choice! But that will reduce your Daily Safe Limit to ₹800 for the rest of the week. Still want to scan?'");
+                }, 800);
+            } 
+            else if (text.includes("stressed") || text.includes("sad")) {
+                face.innerText = "🫂";
+                msg.innerText = "Take a breath, I've got you.";
+                document.body.classList.add('stress-mode');
+                alert("Buddy has activated Shield Mode. I'll make it harder to spend for the next 4 hours so you don't regret it later.");
             }
-            container.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function closeModule() { document.getElementById('module-container').style.display = 'none'; }
-
-        // MOOD & RUNWAY LOGIC
-        function updateMood(mood, el) {
-            document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
-            el.classList.add('active');
-            document.body.classList.toggle('shield-mode', mood === 'Stressed');
-        }
-
-        function processNudge() {
-            const price = document.getElementById('itemPrice').value;
-            const name = document.getElementById('itemName').value;
-            if(!price) return;
-            const days = (price / DAILY_BURN).toFixed(1);
-            document.getElementById('nudgeText').innerHTML = `This <b>${name}</b> will cost <b>${days} days</b> of your family's freedom. Is it worth the trade?`;
-            document.getElementById('nudgeSection').style.display = 'block';
-        }
-
-        function resolve(choice) {
-            if(choice === 'save') confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-            document.getElementById('nudgeSection').style.display = 'none';
-        }
-
-        // NAVIGATION SIMULATION
-        function showView(view) {
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-            alert("Switching to " + view.toUpperCase() + " view. In a real app, this would change the screen content.");
-        }
-
-        // CHART INITIALIZATION
-        const ctx = document.getElementById('wealthChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Cash', 'SIPs', 'Gold'],
-                datasets: [{
-                    data: [65200, 280000, 39300],
-                    backgroundColor: ['#2196F3', '#138808', '#FFCC00'],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                maintainAspectRatio: false,
-                plugins: { legend: { position: 'right' } },
-                cutout: '70%'
+            else if (text.includes("save") || text.includes("invest")) {
+                confetti();
+                face.innerText = "🥳";
+                msg.innerText = "Boom! Wealth increased.";
+                alert("Awesome! I've moved that money into your Home Fund. You're a legend!");
             }
-        });
+            else {
+                face.innerText = "😊";
+                msg.innerText = "I'm here! What's on your mind?";
+            }
+
+            document.getElementById('userInput').value = '';
+        }
+
+        // Auto-update message based on time of day
+        window.onload = () => {
+            const hour = new Date().getHours();
+            const msg = document.getElementById('buddy-msg');
+            if (hour < 12) msg.innerText = "Good morning, Arjun! Ready to save?";
+            else if (hour > 18) msg.innerText = "Evening! Don't let late-night scrolls eat your Shield.";
+        }
     </script>
 </body>
 </html>
-        
-   
+           
