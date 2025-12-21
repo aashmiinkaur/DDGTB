@@ -3,347 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Mindful Spend Pro: Nerve Center</title>
+    <title>Sarthi: Emotional Money Companion</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
     <style>
         :root {
-            --primary: #2196F3;
-            --success: #4CAF50;
-            --danger: #f44336;
-            --warning: #FF9800;
-            --buddy-color: #673ab7;
-            --bg: #f4f7f6;
-            --card-grad: linear-gradient(135deg, #673ab7, #2196F3);
+            --primary: #FF9933; /* Indian Saffron - Energy */
+            --success: #138808; /* Indian Green - Growth */
+            --buddy-blue: #000080; /* Ashoka Blue - Trust */
+            --bg: #f8f9fe;
         }
 
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            background-color: var(--bg); margin: 0; display: flex; flex-direction: column; 
-            align-items: center; min-height: 100vh; transition: filter 0.8s ease, background 0.5s;
-            padding-bottom: 70px; -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, sans-serif; 
+            background-color: var(--bg); margin: 0; padding-bottom: 80px;
+            transition: filter 0.5s ease;
         }
 
-        body.grayscale-mode { filter: grayscale(100%) contrast(1.1); }
-        body.HIGH_STRESS { background-color: #ffebee; }
-        .hidden { display: none !important; }
+        body.grayscale-mode { filter: grayscale(100%); }
 
-        /* Navigation */
-        .tab-bar { 
-            width: 100%; max-width: 500px; display: none;
-            background: white; position: sticky; top: 0; z-index: 1000; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        /* Nudge Hub */
+        .nudge-header { 
+            background: linear-gradient(135deg, var(--buddy-blue), #2196F3); 
+            color: white; padding: 25px 20px; border-radius: 0 0 30px 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
-        .tab { 
-            padding: 18px; cursor: pointer; flex: 1; text-align: center; 
-            font-weight: bold; color: #aaa; border-bottom: 3px solid transparent; font-size: 12px;
-        }
-        .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
 
-        /* Cards */
-        .container { width: 100%; max-width: 450px; padding: 15px; box-sizing: border-box; }
         .card { 
-            background: white; padding: 20px; border-radius: 24px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 15px; text-align: center;
-            position: relative; overflow: hidden;
+            background: white; margin: 15px; padding: 20px; border-radius: 20px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative;
         }
 
-        /* Proactive Hub */
-        .hub-card { background: var(--card-grad); color: white; text-align: left; }
-        .market-tag { 
-            display: inline-block; background: rgba(255,255,255,0.2); 
-            padding: 4px 10px; border-radius: 8px; font-size: 10px; margin-right: 5px; margin-top: 10px;
+        /* Mood Chips */
+        .mood-container { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
+        .mood-chip { 
+            padding: 10px 18px; border-radius: 20px; background: white; border: 1.5px solid #eee;
+            font-size: 13px; white-space: nowrap; cursor: pointer; transition: 0.3s;
         }
+        .mood-chip.active { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
 
-        /* Wallet & Bank Styles */
-        .bank-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
-        .bank-info { text-align: left; }
-        .bank-info span { font-size: 10px; color: #888; display: block; }
-        .bank-balance { font-weight: bold; font-family: monospace; }
+        /* Unified Asset List */
+        .asset-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f5f5f5; }
+        .asset-label { font-size: 14px; font-weight: 500; }
+        .asset-val { font-family: 'Courier New', monospace; font-weight: bold; color: var(--buddy-blue); }
 
-        /* Safety Net Visual */
-        .safety-net-container { height: 12px; background: #eee; border-radius: 6px; margin: 10px 0; overflow: hidden; border: 1px solid #ddd; }
-        #net-fill { height: 100%; background: linear-gradient(90deg, var(--buddy-color), var(--primary)); transition: 1.5s ease-in-out; }
+        /* Progress Bar */
+        .progress-container { height: 8px; background: #eee; border-radius: 4px; margin: 10px 0; }
+        .progress-fill { height: 100%; background: var(--success); border-radius: 4px; transition: 1s; }
 
-        /* General UI */
-        .mood-btn { border: 1px solid #ddd; background: white; border-radius: 12px; padding: 10px; font-size: 12px; cursor: pointer; width: 30%; margin: 1%; }
-        .mood-btn.active { border-color: var(--primary); background: #e3f2fd; font-weight: bold; }
-        input, textarea, select { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; border-radius: 14px; font-size: 16px; box-sizing: border-box; }
-        button { width: 100%; padding: 16px; border: none; border-radius: 16px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 10px; }
-        .btn-main { background: var(--primary); color: white; }
-        .btn-success { background: var(--success); color: white; }
-        .btn-buddy { background: var(--buddy-color); color: white; }
+        /* Buttons */
+        .btn-pulse { width: 100%; padding: 16px; background: var(--buddy-blue); color: white; border: none; border-radius: 15px; font-weight: bold; font-size: 16px; margin-top: 10px; }
+        .btn-save { background: var(--success); color: white; flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: bold; }
+        .btn-spend { background: #f5f5f5; color: #666; flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: bold; }
+
+        input { width: 100%; padding: 14px; margin: 8px 0; border: 1.5px solid #eee; border-radius: 12px; box-sizing: border-box; font-size: 16px; }
         
-        .bubble { width: 60px; height: 60px; background: rgba(33, 150, 243, 0.2); border-radius: 50%; margin: 15px auto; display: flex; align-items: center; justify-content: center; animation: breathe 4s infinite ease-in-out; }
-        @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+        /* Bottom Nav */
+        .nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; border-top: 1px solid #eee; z-index: 100; }
+        .nav-item { flex: 1; text-align: center; padding: 15px; font-size: 11px; color: #999; }
+        .nav-item.active { color: var(--buddy-blue); font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <audio id="success-sound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" preload="auto"></audio>
-
-    <div id="auth-screen" class="container" style="margin-top: 50px;">
-        <div class="card">
-            <h1 style="color: var(--primary); margin-bottom: 5px;">Mindful Spend</h1>
-            <p style="color: #666; font-size: 14px; margin-bottom: 20px;">The Financial Nerve Center</p>
-            <input type="email" id="auth-email" placeholder="Email Address">
-            <input type="password" id="auth-pass" placeholder="Password">
-            <button class="btn-main" onclick="handleAuth()">Unlock Command Center</button>
+    <div class="nudge-header">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="margin: 0; font-size: 20px;">Namaste, Arjun 🙏</h2>
+            <div id="lang-toggle" style="font-size: 12px; background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 10px;">EN | हिंदी</div>
+        </div>
+        <p id="main-nudge" style="margin: 15px 0; font-size: 15px; line-height: 1.4; opacity: 0.95;">
+            "Analyzing your safety net... You have <b>₹42,000</b> in surplus this month. Shall we move it to your <b>'Sister's Wedding'</b> Gold SIP?"
+        </p>
+        <div class="progress-container"><div class="progress-fill" style="width: 58%;"></div></div>
+        <div style="display: flex; justify-content: space-between; font-size: 11px;">
+            <span>🛡️ Safety: 58% Secure</span>
+            <span>Target: 6 Months Runway</span>
         </div>
     </div>
 
-    <div class="tab-bar" id="app-nav">
-        <div class="tab active" onclick="switchTab('dashboard', this)">🏠 Home</div>
-        <div class="tab" onclick="switchTab('wallet', this)">👛 Assets</div>
-        <div class="tab" onclick="switchTab('invest', this)">📈 Shield</div>
-        <div class="tab" onclick="switchTab('social', this)">👥 Buddy</div>
+    <div class="card" style="margin-top: -20px;">
+        <h5 style="margin: 0 0 10px 0; color: #555;">How is your heart feeling today?</h5>
+        <div class="mood-container">
+            <div class="mood-chip active" onclick="setMood('Calm', this)">😌 Shanti (Calm)</div>
+            <div class="mood-chip" onclick="setMood('Stressed', this)">😰 Family Pressure</div>
+            <div class="mood-chip" onclick="setMood('Excited', this)">🤑 Salary High!</div>
+            <div class="mood-chip" onclick="setMood('Bored', this)">🥱 Just Browsing</div>
+        </div>
     </div>
 
-    <div id="main-content" class="hidden">
-        
-        <div id="dashboard-screen" class="container">
-            <div class="card hub-card">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <h4 style="margin:0; font-size: 14px;">🤖 CO-PILOT BRIEFING</h4>
-                    <span id="market-status" style="font-size: 10px; background: #4CAF50; padding: 2px 6px; border-radius: 4px;">MARKET OPEN</span>
-                </div>
-                <p id="proactive-advice" style="font-size: 13px; margin: 12px 0; line-height: 1.5;">
-                    "Analyzing your 3 linked accounts. Gold is up 1.2%, making your current holdings more valuable. Consider a Fixed Deposit for your surplus USD."
-                </p>
-                <div style="overflow-x: auto; white-space: nowrap;">
-                    <div class="market-tag">🟡 Gold: $2,150</div>
-                    <div class="market-tag">🏦 FD Rate: 7.2%</div>
-                    <div class="market-tag">👗 ZARA: 40% OFF</div>
-                </div>
-            </div>
+    <div class="card">
+        <h3 style="margin: 0;">🛒 Pulse Check</h3>
+        <p style="font-size: 12px; color: #777;">Before you scan that QR code, let's look at the impact.</p>
+        <input type="text" id="item-name" placeholder="What are you buying? (e.g. Starbucks, Myntra)">
+        <input type="number" id="item-price" placeholder="Amount (₹)">
+        <button class="btn-pulse" onclick="runNudge()">Check Life-Impact</button>
 
-            <div class="card">
-                <div style="text-align: left; font-size: 11px; font-weight: bold; color: #888; display: flex; justify-content: space-between;">
-                    <span>🛡️ UNIFIED SAFETY NET</span>
-                    <span id="net-status">40% SECURE</span>
-                </div>
-                <div class="safety-net-container"><div id="net-fill" style="width: 40%;"></div></div>
-                <p id="safety-msg" style="font-size: 12px; color: #666; margin-top: 5px;">Your total wealth across all banks is growing.</p>
-            </div>
-
-            <div class="card" style="text-align: left; border-left: 4px solid var(--primary); padding: 15px;">
-                <small style="color: var(--primary); font-weight: bold;">📖 DAILY FINANCIAL LESSON</small>
-                <p id="daily-tip" style="font-size: 13px; margin: 5px 0; color: #444;">"An Emergency Fund should cover 6 months of life. You are currently at 2.4 months."</p>
-            </div>
-
-            <div class="card">
-                <h3 style="margin:0 0 10px 0;">🛒 Pulse Check</h3>
-                <input type="text" id="merchant" placeholder="Store or Item name...">
-                <input type="number" id="amount" placeholder="Price ($)">
-                <button class="btn-main" onclick="runFrictionTest()">Calculate Life-Cost</button>
-
-                <div id="intervention-zone" class="hidden">
-                    <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
-                        <div id="cost-analysis-box" style="background:#fff3e0; padding:12px; border-radius:12px; font-size:13px; margin-bottom:15px; color:#e65100;"></div>
-                        <div class="bubble">Breathe</div>
-                        <button class="btn-success" onclick="resolve('Save')">Save to Primary Bank</button>
-                        <button id="buddy-btn" class="btn-buddy" onclick="alertBuddy()" style="font-size: 14px;">💬 Notify Buddy to Unlock Spend</button>
-                        <button id="bypass-btn" class="btn-disabled" onclick="resolve('Spend')" disabled style="font-size: 12px; margin-top: 5px;">⚠️ Emergency Bypass</button>
-                    </div>
-                </div>
+        <div id="nudge-overlay" style="display: none; margin-top: 20px; padding: 15px; background: #fff8e1; border-radius: 15px; border-left: 5px solid var(--primary);">
+            <p id="nudge-msg" style="font-size: 14px; color: #333; line-height: 1.4;"></p>
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn-save" onclick="resolve('save')">Move to SIP</button>
+                <button class="btn-spend" onclick="resolve('spend')">I need this</button>
             </div>
         </div>
+    </div>
 
-        <div id="wallet-screen" class="container hidden">
-            <div class="card">
-                <h3 style="margin: 0 0 15px 0; text-align: left;">Unified Balance</h3>
-                <div id="bank-list">
-                    <div class="bank-row">
-                        <div class="bank-info"><b>Chase Checking</b><span>**** 4290</span></div>
-                        <div class="bank-balance" id="bal-chase">$1,200.00</div>
-                    </div>
-                    <div class="bank-row">
-                        <div class="bank-info"><b>Binance (BTC)</b><span>Exchange Wallet</span></div>
-                        <div class="bank-balance" id="bal-crypto">0.042 BTC</div>
-                    </div>
-                    <div class="bank-row">
-                        <div class="bank-info"><b>Savings (Fixed Deposit)</b><span>Matures Oct 2026</span></div>
-                        <div class="bank-balance" id="bal-fd">$5,000.00</div>
-                    </div>
-                </div>
-                <button class="btn-buddy" style="padding: 10px; font-size: 12px; margin-top: 15px;" onclick="simulateLink()">+ Link New Bank or Wallet</button>
-            </div>
-
-            <div class="card">
-                <h4>🌍 Global Converter</h4>
-                <div style="display: flex; gap: 8px;">
-                    <input type="number" id="conv-amt" placeholder="Amount">
-                    <select id="conv-from" style="width: 120px;">
-                        <option value="USD">USD</option>
-                        <option value="EUR">EUR</option>
-                        <option value="BTC">BTC</option>
-                        <option value="GOLD">GOLD (oz)</option>
-                    </select>
-                </div>
-                <p id="conv-res" style="font-size: 24px; font-weight: bold; color: var(--buddy-color);">$0.00</p>
-                <div id="reality-check" style="background:#e8f5e9; padding:12px; border-radius:12px; font-size:12px; color:#2e7d32; text-align: left;">
-                    Select an asset to see its "Real World" value.
-                </div>
-            </div>
+    <div class="card">
+        <h4 style="margin: 0 0 15px 0; display: flex; justify-content: space-between;">
+            Wealth Summary <span>₹3,84,500</span>
+        </h4>
+        <div style="height: 150px; margin-bottom: 20px;">
+            <canvas id="assetChart"></canvas>
         </div>
-
-        <div id="invest-screen" class="container hidden">
-            <div class="card">
-                <h3>📈 Shield & Strategy</h3>
-                <p style="font-size: 13px; color: #666;">Current Strategy: <b>Conservative Growth</b></p>
-                <input type="text" id="asset" placeholder="Asset (BTC, NVIDIA, GOLD)">
-                <textarea id="invest-reason" placeholder="What is your logic for this move?"></textarea>
-                <button class="btn-buddy" onclick="startInvestCoolDown()">Engage 30s Logic Filter</button>
-            </div>
-            <div id="cool-down-zone" class="card hidden">
-                <div class="bubble">Wait</div>
-                <p id="timer-text" style="font-weight: bold; color: var(--buddy-color);">Cooling down...</p>
-                <div id="translator-box" style="background:#f3e5f5; padding:15px; border-radius:12px; font-size:13px; border-left: 5px solid var(--buddy-color); text-align: left;"></div>
-            </div>
+        <div class="asset-row">
+            <span class="asset-label">🏦 SBI / HDFC Savings</span>
+            <span class="asset-val">₹65,200</span>
         </div>
-
-        <div id="social-screen" class="container hidden">
-            <div class="card">
-                <h3>👥 Sarah J.</h3>
-                <div id="social-feed">
-                    <div style="text-align:left; padding:15px; background:#f9f9f9; border-radius:16px; margin-bottom:10px; font-size:14px;">
-                        "You saved $45 today by skipping that takeout. I've logged that toward your safety net!"
-                    </div>
-                </div>
-            </div>
+        <div class="asset-row">
+            <span class="asset-label">📈 Mutual Funds (SIP)</span>
+            <span class="asset-val">₹2,80,000</span>
         </div>
+        <div class="asset-row">
+            <span class="asset-label">🟡 Digital Gold</span>
+            <span class="asset-val">₹39,300</span>
+        </div>
+        <button style="width: 100%; background: none; border: 1.5px dashed #ccc; color: #888; padding: 10px; border-radius: 10px; margin-top: 15px; font-size: 12px;">
+            + Link via Account Aggregator (AA)
+        </button>
+    </div>
 
+    <div class="nav">
+        <div class="nav-item active">🏠 Sarthi</div>
+        <div class="nav-item">📊 Portfolio</div>
+        <div class="nav-item">🛡️ Shield</div>
+        <div class="nav-item">👥 Family</div>
     </div>
 
     <script>
-        let state = JSON.parse(localStorage.getItem('mindfulSpendData')) || {
-            isLoggedIn: false,
-            totalSaved: 6200.00,
-            goal: 15000.00,
-            wage: 25,
-            history: [],
-            lastAction: Date.now()
-        };
+        let hourlyWage = 450; // Average young professional hourly rate
 
-        const rates = { USD: 1, EUR: 0.92, BTC: 0.000015, GOLD: 0.00048 };
-        const tips = [
-            "The 50/30/20 Rule: 50% Needs, 30% Wants, 20% Savings.",
-            "FDs are great now because interest rates are at a 5-year high.",
-            "Gold is a hedge against inflation. Keep 5-10% of your wealth there.",
-            "A Savings account is for liquid cash; a Current account is for high-volume transactions."
-        ];
-
-        function handleAuth() {
-            state.isLoggedIn = true;
-            saveAppData();
-            initApp();
-        }
-
-        function initApp() {
-            if (state.isLoggedIn) {
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('main-content').classList.remove('hidden');
-                document.getElementById('app-nav').style.display = 'flex';
-                updateView();
-                checkProactiveAdvice();
-            }
-        }
-
-        function checkProactiveAdvice() {
-            const adviceEl = document.getElementById('proactive-advice');
-            const tipEl = document.getElementById('daily-tip');
-            
-            // Proactive Logic based on Balance
-            if (state.totalSaved < 5000) {
-                adviceEl.innerHTML = "⚠️ <b>High Risk Alert:</b> Your unified liquid balance is below target. Avoid the ZARA sale; put any spare cash into your Chase Savings (4.1% APY).";
-                document.body.style.filter = "sepia(0.1)";
-            } else {
-                adviceEl.innerHTML = "🌟 <b>Growth Opportunity:</b> You have a surplus. Bank FDs are offering 7.2% today—better than keeping it in your Current account!";
-            }
-            
-            tipEl.innerText = tips[Math.floor(Math.random() * tips.length)];
-        }
-
-        function simulateLink() {
-            const bank = prompt("Enter Bank Name (e.g. HSBC, Coinbase, Apple Card):");
-            if(bank) {
-                alert(`Securely connecting to ${bank}... Unified balance updated.`);
-                confetti();
-            }
-        }
-
-        // Converter
-        document.getElementById('conv-amt')?.addEventListener('input', () => {
-            const amt = parseFloat(document.getElementById('conv-amt').value) || 0;
-            const from = document.getElementById('conv-from').value;
-            const usdVal = amt / rates[from];
-            document.getElementById('conv-res').innerText = `$${usdVal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-            
-            let reality = "This is your life energy.";
-            if(from === 'GOLD') reality = "💡 <b>Asset View:</b> Gold is 'Patient Money.' It doesn't grow fast, but it never dies.";
-            if(from === 'BTC') reality = "💡 <b>Risk View:</b> This is high volatility. Only invest what you can 'lose' without crying.";
-            document.getElementById('reality-check').innerHTML = reality;
-        });
-
-        function runFrictionTest() {
-            const amt = parseFloat(document.getElementById('amount').value);
-            if (!amt) return;
-            const hours = (amt / state.wage).toFixed(1);
-            document.body.classList.add('HIGH_STRESS', 'grayscale-mode');
-            document.getElementById('intervention-zone').classList.remove('hidden');
-            document.getElementById('cost-analysis-box').innerHTML = `⚠️ <b>Proactive Warning:</b> This item costs <b>${hours} hours</b> of your life. ZARA has a sale next week—wait?`;
-        }
-
-        function resolve(choice) {
-            if (choice === 'Save') {
-                const amt = parseFloat(document.getElementById('amount').value);
-                state.totalSaved += amt;
-                confetti();
-                document.getElementById('success-sound').play();
-            }
-            saveAppData();
-            updateView();
-            resetUI();
-        }
-
-        function switchTab(tabId, el) {
-            document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.getElementById(tabId + '-screen').classList.remove('hidden');
+        function setMood(mood, el) {
+            document.querySelectorAll('.mood-chip').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
+            const nudge = document.getElementById('main-nudge');
+            
+            if(mood === 'Stressed') {
+                nudge.innerHTML = "I hear you. When things are heavy at home, we tend to spend for comfort. I've activated <b>Shield Mode</b> to protect your savings today.";
+                document.body.classList.add('grayscale-mode');
+            } else if(mood === 'Excited') {
+                nudge.innerHTML = "Salary high! 🤑 It's tempting to splurge. Let's lock ₹5k into your <b>Emergency Fund</b> first so you can party guilt-free!";
+                document.body.classList.remove('grayscale-mode');
+            } else {
+                nudge.innerHTML = "You're in a good headspace. Your <b>Safety Net</b> is 58% full. On track to reach your goal by Diwali!";
+                document.body.classList.remove('grayscale-mode');
+            }
         }
 
-        function updateView() {
-            const perc = (state.totalSaved / state.goal) * 100;
-            document.getElementById('net-fill').style.width = Math.min(perc, 100) + "%";
-            document.getElementById('net-status').innerText = Math.min(perc, 100).toFixed(0) + "% SECURE";
-            document.getElementById('bal-chase').innerText = `$${(state.totalSaved * 0.2).toFixed(2)}`;
-            document.getElementById('bal-fd').innerText = `$${(state.totalSaved * 0.8).toFixed(2)}`;
+        function runNudge() {
+            const name = document.getElementById('item-name').value;
+            const price = document.getElementById('item-price').value;
+            if(!price) return;
+
+            const hours = (price / hourlyWage).toFixed(1);
+            const msg = document.getElementById('nudge-msg');
+            msg.innerHTML = `Arjun, this <b>${name}</b> costs <b>${hours} hours</b> of your hard work. 🛋️<br><br>It also pushes your <b>'New Laptop'</b> goal back by 12 days. Do you really want to scan this QR?`;
+            
+            document.getElementById('nudge-overlay').style.display = 'block';
         }
 
-        function saveAppData() {
-            localStorage.setItem('mindfulSpendData', JSON.stringify(state));
+        function resolve(type) {
+            if(type === 'save') {
+                confetti();
+                alert("Smart choice! ₹" + document.getElementById('item-price').value + " redirected to your Wealth Pot.");
+            }
+            document.getElementById('nudge-overlay').style.display = 'none';
+            document.getElementById('item-name').value = '';
+            document.getElementById('item-price').value = '';
         }
 
-        function resetUI() {
-            document.body.classList.remove('HIGH_STRESS', 'grayscale-mode');
-            document.getElementById('intervention-zone').classList.add('hidden');
-            document.getElementById('amount').value = "";
-            document.getElementById('merchant').value = "";
-        }
-
-        function alertBuddy() {
-            document.getElementById('buddy-btn').innerText = "Buddy Alerted! (Bypass Unlocked)";
-            document.getElementById('bypass-btn').disabled = false;
-            document.getElementById('bypass-btn').classList.remove('btn-disabled');
-            document.getElementById('bypass-btn').style.background = "var(--danger)";
-        }
-
-        window.onload = initApp;
+        // India-focused Asset Chart
+        const ctx = document.getElementById('assetChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Cash', 'Mutual Funds', 'Gold'],
+                datasets: [{
+                    data: [65200, 280000, 39300],
+                    backgroundColor: ['#2196F3', '#138808', '#FF9933'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } }
+            }
+        });
     </script>
 </body>
 </html>
+            
