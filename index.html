@@ -3,194 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sarthi: Your Money Buddy</title>
+    <title>Sarthi 2.0: Your Life Companion</title>
     
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
     <style>
         :root {
-            --buddy-indigo: #6366f1;
+            --buddy-main: #6366f1;
             --safe-green: #22c55e;
             --warn-yellow: #f59e0b;
             --danger-red: #ef4444;
-            --bg-slate: #f8fafc;
+            --bg-slate: #f1f5f9;
         }
 
         body { 
             font-family: 'Segoe UI', system-ui, sans-serif; 
-            background-color: var(--bg-slate); margin: 0; padding-bottom: 120px;
-            color: #1e293b; transition: all 0.4s ease;
+            background-color: var(--bg-slate); margin: 0; padding-bottom: 100px;
+            color: #1e293b; overflow-x: hidden;
         }
 
-        /* 1. The Buddy Header (Visual Status) */
-        .buddy-header { 
-            background: var(--buddy-indigo); color: white; 
-            padding: 40px 20px 60px; text-align: center;
-            border-radius: 0 0 40px 40px; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2);
-        }
-        .buddy-avatar {
-            width: 80px; height: 80px; background: white; border-radius: 50%;
-            margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;
-            font-size: 40px; border: 4px solid var(--safe-green);
-        }
-        .buddy-status { font-size: 22px; font-weight: 700; margin: 0; }
-        .buddy-sub { font-size: 14px; opacity: 0.8; margin-top: 5px; }
-
-        /* 2. Simple Metric Cards */
-        .card { 
-            background: white; margin: -30px 20px 20px; padding: 25px; 
-            border-radius: 28px; box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+        /* 1. Habit-Forming Header (Streaks & Status) */
+        .header { 
+            background: linear-gradient(135deg, var(--buddy-main), #4338ca);
+            color: white; padding: 30px 20px 50px; border-radius: 0 0 40px 40px;
             position: relative;
         }
-
-        .safe-spend-box { text-align: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 20px; margin-bottom: 20px; }
-        .amount { font-size: 40px; font-weight: 800; color: var(--buddy-indigo); display: block; }
-        .label { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
-
-        .bucket-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .bucket { background: #f1f5f9; padding: 15px; border-radius: 20px; text-align: center; }
-        .bucket b { display: block; font-size: 16px; color: var(--buddy-indigo); }
-        .bucket span { font-size: 11px; color: #64748b; }
-
-        /* 3. The "Buddy" Chat Input */
-        .chat-dock {
-            position: fixed; bottom: 20px; left: 15px; right: 15px;
-            background: white; border-radius: 50px; display: flex;
-            align-items: center; padding: 8px 10px;
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;
-            z-index: 1000;
-        }
-        .chat-dock input {
-            flex: 1; border: none; padding: 12px 15px; font-size: 16px;
-            outline: none; background: transparent;
-        }
-        .chat-dock button {
-            background: var(--buddy-indigo); color: white; border: none;
-            width: 45px; height: 45px; border-radius: 50%; font-weight: bold;
-            cursor: pointer; transition: transform 0.2s;
-        }
-        .chat-dock button:active { transform: scale(0.9); }
-
-        /* Privacy & Settings */
-        .privacy-pill { 
-            display: inline-block; background: #e0e7ff; color: #4338ca; 
-            padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
-            margin-top: 15px;
+        .streak-badge {
+            position: absolute; top: 20px; right: 20px;
+            background: rgba(255,255,255,0.2); padding: 5px 12px;
+            border-radius: 20px; font-size: 12px; font-weight: bold;
+            display: flex; align-items: center; gap: 5px;
         }
 
-        /* 4. Goals Section */
-        .goal-card { background: #fff; margin: 0 20px 20px; padding: 20px; border-radius: 24px; display: flex; align-items: center; gap: 15px; border: 1px solid #edf2f7; }
-        .goal-icon { font-size: 24px; padding: 12px; background: #fef3c7; border-radius: 15px; }
-        .progress-bar { flex: 1; height: 8px; background: #eee; border-radius: 10px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--warn-yellow); width: 65%; }
+        /* 2. The Unified Bucket Card */
+        .main-card { 
+            background: white; margin: -30px 15px 15px; padding: 20px; 
+            border-radius: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+        .safe-limit { text-align: center; margin-bottom: 20px; }
+        .safe-limit .amt { font-size: 38px; font-weight: 900; color: var(--buddy-main); display: block; }
+        
+        /* 3. Social & Habit Sections */
+        .social-feed { background: #eef2ff; padding: 12px; border-radius: 20px; margin-bottom: 15px; font-size: 13px; }
 
-        /* Gray mode for stress */
-        body.stress-mode { filter: grayscale(100%); }
+        /* 4. Unified Transaction Folder */
+        .folder-tab { background: white; margin: 0 15px 15px; border-radius: 24px; padding: 15px; border: 1px solid #e2e8f0; }
+        .txn-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+        .txn-icon { width: 35px; height: 35px; border-radius: 10px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; }
+
+        /* 5. The "Buddy" Multi-Tool (Voice + UPI) */
+        .buddy-dock {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: white; padding: 15px 20px 30px;
+            border-radius: 30px 30px 0 0; box-shadow: 0 -10px 30px rgba(0,0,0,0.1);
+            display: flex; gap: 10px; align-items: center;
+        }
+        .buddy-input {
+            flex: 1; background: #f1f5f9; border-radius: 25px;
+            padding: 12px 20px; display: flex; align-items: center;
+        }
+        .buddy-input input { border: none; background: transparent; flex: 1; outline: none; font-size: 16px; }
+        .action-btn { 
+            width: 50px; height: 50px; border-radius: 50%; border: none; 
+            color: white; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .btn-pay { background: var(--buddy-main); font-weight: bold; }
+        .btn-mic { background: var(--danger-red); font-size: 20px; }
+
+        /* Animations */
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .active-streak { animation: pulse 2s infinite; }
     </style>
 </head>
 <body>
 
-    <div class="buddy-header">
-        <div class="buddy-avatar" id="buddy-face">😌</div>
-        <h2 class="buddy-status" id="buddy-msg">"You're doing great, Arjun!"</h2>
-        <div class="buddy-sub">Your Family Shield is strong for 164 days.</div>
-    </div>
-
-    <div class="card">
-        <div class="safe-spend-box">
-            <span class="label">Guilt-Free Spending Today</span>
-            <span class="amount" id="safe-amt">₹2,450</span>
-        </div>
-        
-        <div class="bucket-grid">
-            <div class="bucket">
-                <span>🛡️ Shield</span>
-                <b>164 Days</b>
-            </div>
-            <div class="bucket">
-                <span>🟡 Gold Wealth</span>
-                <b>₹39,300</b>
+    <div class="header">
+        <div class="streak-badge active-streak">🔥 12 Day Streak</div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="font-size: 40px;">😌</div>
+            <div>
+                <h2 style="margin:0; font-size: 18px;">Morning, Arjun!</h2>
+                <p style="margin:0; font-size: 13px; opacity: 0.8;">Your shield covers 164 days.</p>
             </div>
         </div>
-
-        <center>
-            <div class="privacy-pill">🔒 Private: Only you see what you buy</div>
-        </center>
     </div>
 
-    <div class="goal-card">
-        <div class="goal-icon">🏠</div>
-        <div style="flex:1">
-            <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px;">
-                <b>Home Fund</b>
-                <span>65%</span>
+    <div class="main-card">
+        <div class="safe-limit">
+            <span style="font-size: 11px; color: #64748b; text-transform: uppercase;">Guilt-Free Spending</span>
+            <span class="amt" id="safeAmt">₹2,450</span>
+        </div>
+
+        <div class="social-feed">
+            🤝 <b>Buddy Win:</b> Rahul just saved ₹200 on coffee!
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div style="background: #f8fafc; padding: 12px; border-radius: 15px; text-align: center;">
+                <span style="font-size: 11px;">🏠 Home Fund</span>
+                <div style="font-weight: bold; color: var(--warn-yellow);">65% Done</div>
             </div>
-            <div class="progress-bar"><div class="progress-fill"></div></div>
+            <div style="background: #f8fafc; padding: 12px; border-radius: 15px; text-align: center;">
+                <span style="font-size: 11px;">🛡️ Safety Net</span>
+                <div style="font-weight: bold; color: var(--safe-green);">Secure</div>
+            </div>
         </div>
     </div>
 
-    <div style="padding: 0 25px; margin-bottom: 30px;">
-        <h4 style="margin: 0 0 8px 0; font-size: 14px; color: #64748b;">Buddy's Advice 💡</h4>
-        <p style="margin:0; font-size: 14px; line-height: 1.5; color: #475569;">
-            "Arjun, if you skip one Zomato order today, we can hit your <b>Home Fund</b> target 4 days early! Just a thought."
-        </p>
+    <div class="folder-tab">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h4 style="margin:0;">Recent Spends</h4>
+            <span style="font-size: 12px; color: var(--buddy-main); font-weight: bold;">View All</span>
+        </div>
+        <div class="txn-item">
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <div class="txn-icon">🛒</div>
+                <div><b style="font-size: 14px;">Zomato</b><br><small style="color: #94a3b8;">Today, 2:15 PM</small></div>
+            </div>
+            <b>- ₹450</b>
+        </div>
+        <div class="txn-item">
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <div class="txn-icon">🏦</div>
+                <div><b style="font-size: 14px;">SIP Deposit</b><br><small style="color: #94a3b8;">Yesterday</small></div>
+            </div>
+            <b style="color: var(--safe-green);">+ ₹2,000</b>
+        </div>
     </div>
 
-    <div class="chat-dock">
-        <input type="text" id="userInput" placeholder="Ask Buddy: 'Can I buy shoes?'">
-        <button onclick="talkToBuddy()">Go</button>
+    <div class="buddy-dock">
+        <button class="action-btn btn-mic" onclick="startVoice()">🎙️</button>
+        <div class="buddy-input">
+            <input type="text" id="buddyIn" placeholder="Talk to Sarthi...">
+        </div>
+        <button class="action-btn btn-pay" onclick="handleBuddy()">Pay</button>
     </div>
 
     <script>
-        const DAILY_ALLOWANCE = 2450;
-        const SHIELD_DAYS = 164;
-
-        function talkToBuddy() {
-            const text = document.getElementById('userInput').value.toLowerCase();
-            const face = document.getElementById('buddy-face');
-            const msg = document.getElementById('buddy-msg');
-            const safeAmt = document.getElementById('safe-amt');
-
-            if (!text) return;
-
-            // Simple Buddy Logic
-            if (text.includes("buy") || text.includes("cost") || text.includes("price")) {
-                face.innerText = "🤔";
-                msg.innerText = "Let's check the math...";
-                setTimeout(() => {
-                    face.innerText = "🧐";
-                    alert("Buddy Says: 'Nice choice! But that will reduce your Daily Safe Limit to ₹800 for the rest of the week. Still want to scan?'");
-                }, 800);
-            } 
-            else if (text.includes("stressed") || text.includes("sad")) {
-                face.innerText = "🫂";
-                msg.innerText = "Take a breath, I've got you.";
-                document.body.classList.add('stress-mode');
-                alert("Buddy has activated Shield Mode. I'll make it harder to spend for the next 4 hours so you don't regret it later.");
-            }
-            else if (text.includes("save") || text.includes("invest")) {
+        function handleBuddy() {
+            const val = document.getElementById('buddyIn').value.toLowerCase();
+            
+            // AI Emotional Nudge Logic
+            if(val.includes('buy') || val.includes('pay')) {
+                alert("Sarthi Buddy: 'Wait! 🛑 Buying this now reduces your Home Fund streak. If we wait 2 days, I can help you find a 10% discount. Should we proceed?'");
+            } else if(val.includes('save')) {
                 confetti();
-                face.innerText = "🥳";
-                msg.innerText = "Boom! Wealth increased.";
-                alert("Awesome! I've moved that money into your Home Fund. You're a legend!");
+                alert("Sarthi Buddy: 'Incredible! I've moved that to your Gold Wealth. Your streak is now 13 days! 🚀'");
+            } else {
+                alert("Sarthi Buddy: 'I heard you! Let's make a smart move today.'");
             }
-            else {
-                face.innerText = "😊";
-                msg.innerText = "I'm here! What's on your mind?";
-            }
-
-            document.getElementById('userInput').value = '';
+            document.getElementById('buddyIn').value = '';
         }
 
-        // Auto-update message based on time of day
-        window.onload = () => {
-            const hour = new Date().getHours();
-            const msg = document.getElementById('buddy-msg');
-            if (hour < 12) msg.innerText = "Good morning, Arjun! Ready to save?";
-            else if (hour > 18) msg.innerText = "Evening! Don't let late-night scrolls eat your Shield.";
+        function startVoice() {
+            alert("Buddy is listening (Regional Language Voice Search Active)... Speak now!");
         }
     </script>
 </body>
 </html>
-           
