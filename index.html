@@ -3,199 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sarthi 2.0: Your Life Companion</title>
-    
+    <title>Sarthi | Your Financial Co-Pilot</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-
     <style>
-        :root {
-            --buddy-indigo: #6366f1;
-            --safe-green: #22c55e;
-            --warn-saffron: #f59e0b;
-            --danger-red: #ef4444;
-            --bg-slate: #f8fafc;
-        }
-
-        body { 
-            font-family: 'Segoe UI', system-ui, sans-serif; 
-            background-color: var(--bg-slate); margin: 0; padding-bottom: 120px;
-            color: #1e293b; overflow-x: hidden;
-        }
-
-        /* 1. Co-Pilot Briefing (Instagram Style Stories) */
-        .story-shelf {
-            display: flex; gap: 15px; padding: 20px; overflow-x: auto;
-            background: white; border-bottom: 1px solid #e2e8f0;
-        }
-        .story-circle {
-            min-width: 70px; text-align: center; font-size: 10px; font-weight: 600;
-        }
-        .story-img {
-            width: 60px; height: 60px; border-radius: 50%; 
-            border: 3px solid var(--buddy-indigo); padding: 2px; margin-bottom: 5px;
-            display: flex; align-items: center; justify-content: center; font-size: 24px;
-        }
-
-        /* 2. Streak Header */
-        .header { 
-            background: linear-gradient(135deg, var(--buddy-indigo), #4338ca);
-            color: white; padding: 25px 20px 50px; position: relative;
-        }
-        .streak-fire {
-            position: absolute; top: 20px; right: 20px;
-            background: rgba(255,255,255,0.2); padding: 5px 12px;
-            border-radius: 20px; font-size: 13px; font-weight: bold;
-        }
-
-        /* 3. Main Metric Card (Unified Assets) */
-        .main-card { 
-            background: white; margin: -30px 15px 15px; padding: 25px; 
-            border-radius: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-        }
-        .guilt-free { text-align: center; }
-        .guilt-free .amt { font-size: 42px; font-weight: 900; color: var(--buddy-indigo); display: block; }
+        :root { --primary: #6366f1; --bg: #f8fafc; --text: #1e293b; --success: #22c55e; --danger: #ef4444; }
+        body, html { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; height: 100%; }
         
-        /* 4. Social Wealth Feed (The "Dopamine" Hit) */
-        .buddy-wins { 
-            background: #eef2ff; margin: 0 15px 15px; padding: 15px; 
-            border-radius: 20px; font-size: 13px; color: #4338ca; border: 1px solid #c7d2fe;
-        }
+        /* --- NAVIGATION --- */
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: white; display: none; justify-content: space-around; padding: 15px 0; border-top: 1px solid #e2e8f0; z-index: 1000; }
+        .nav-item { font-size: 24px; cursor: pointer; opacity: 0.4; transition: 0.3s; }
+        .active-nav { opacity: 1; transform: translateY(-3px); color: var(--primary); }
 
-        /* 5. Unified Transaction Folder */
-        .folder-tab { background: white; margin: 0 15px 15px; border-radius: 24px; padding: 20px; border: 1px solid #e2e8f0; }
-        .txn-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
-        .txn-icon { width: 40px; height: 40px; border-radius: 12px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        /* --- SCREENS --- */
+        .screen { display: none; min-height: 100vh; width: 100vw; flex-direction: column; padding-bottom: 100px; }
+        .active { display: flex; }
 
-        /* 6. Impulse Shield Timer */
-        #shieldTimer {
-            display: none; background: var(--danger-red); color: white;
-            text-align: center; padding: 15px; position: fixed; top: 0; left: 0; right: 0; z-index: 2000;
-        }
+        /* --- SLIM HEADER --- */
+        .header-slim { background: var(--primary); color: white; padding: 20px; border-radius: 0 0 30px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header-slim h2 { margin: 0; font-size: 24px; font-weight: 800; }
+        .streak-chip { background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; }
 
-        /* 7. Voice-First Buddy Dock */
-        .buddy-dock {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: white; padding: 15px 20px 30px;
-            border-radius: 30px 30px 0 0; box-shadow: 0 -10px 30px rgba(0,0,0,0.1);
-            display: flex; gap: 12px; align-items: center; z-index: 1000;
-        }
-        .buddy-input {
-            flex: 1; background: #f1f5f9; border-radius: 25px;
-            padding: 12px 20px; display: flex; align-items: center;
-        }
-        .buddy-input input { border: none; background: transparent; flex: 1; outline: none; font-size: 16px; }
-        .btn-action { 
-            width: 55px; height: 55px; border-radius: 50%; border: none; 
-            color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 22px;
-        }
+        /* --- LOGIN --- */
+        #loginScreen { background: var(--primary); align-items: center; justify-content: center; position: fixed; z-index: 5000; inset: 0; }
+        .login-box { background: white; width: 85%; padding: 40px 25px; border-radius: 24px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
+        .pin-field { width: 100%; padding: 15px; margin: 20px 0; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 20px; text-align: center; box-sizing: border-box; }
+
+        /* --- ASSET CARDS --- */
+        .section-label { margin: 20px 20px 10px; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; }
+        .asset-card { background: white; margin: 0 15px 10px; padding: 16px; border-radius: 18px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; }
+        .asset-info { display: flex; align-items: center; gap: 12px; }
+        .asset-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .amt { font-weight: 800; font-size: 16px; text-align: right; }
+        .sub-amt { font-size: 11px; color: #64748b; font-weight: 400; }
+
+        /* --- MISSIONS --- */
+        .mission-card { background: white; margin: 0 15px 15px; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .progress-container { height: 8px; background: #f1f5f9; border-radius: 4px; margin: 12px 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); transition: 1s ease-out; }
+
+        /* --- ADVICE --- */
+        .advice-banner { background: #eff6ff; border: 1px dashed var(--primary); margin: 15px; padding: 15px; border-radius: 15px; font-size: 12px; display: flex; gap: 10px; align-items: center; }
+
+        /* --- VOICE OVERLAY --- */
+        #voiceOverlay { display: none; position: fixed; inset: 0; background: rgba(99, 102, 241, 0.98); z-index: 6000; flex-direction: column; align-items: center; justify-content: center; color: white; }
     </style>
 </head>
 <body>
 
-    <div id="shieldTimer">⚠️ Impulse Shield Active: Thinking time remaining... <span id="seconds">30</span>s</div>
-
-    <div class="story-shelf">
-        <div class="story-circle"><div class="story-img">📊</div>Briefing</div>
-        <div class="story-circle"><div class="story-img" style="border-color: var(--safe-green)">🛡️</div>Shield</div>
-        <div class="story-circle"><div class="story-img" style="border-color: var(--warn-saffron)">🏆</div>Rahul</div>
-        <div class="story-circle"><div class="story-img" style="border-color: #ddd">➕</div>Family</div>
+    <div id="loginScreen" class="screen active">
+        <div class="login-box">
+            <h2 style="color: var(--primary); margin: 0;">Sarthi</h2>
+            <p style="color: #64748b; font-size: 14px; margin-top: 5px;">Your Financial Co-Pilot</p>
+            <input type="password" class="pin-field" id="pinInput" placeholder="Enter PIN" maxlength="4">
+            <button onclick="unlock()" style="background: var(--primary); color: white; width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;">Enter Securely</button>
+            <p style="font-size: 11px; margin-top: 15px; color: #94a3b8;">Biometric Security Enabled</p>
+        </div>
     </div>
 
-    <div class="header">
-        <div class="streak-fire">🔥 12 Day Streak</div>
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <div style="font-size: 40px;">😌</div>
+    <div id="homeScreen" class="screen">
+        <div class="header-slim">
             <div>
-                <h2 style="margin:0; font-size: 18px;">Good Morning, Arjun!</h2>
-                <p style="margin:0; font-size: 13px; opacity: 0.8;">"You're 4 days away from your Home Fund goal."</p>
+                <p style="margin: 0; font-size: 11px; opacity: 0.9;">Guilt-Free Spending Today</p>
+                <h2>₹2,450</h2>
             </div>
+            <div class="streak-chip">🔥 12 Day Streak</div>
+        </div>
+
+        <div class="advice-banner">
+            <span style="font-size: 20px;">💡</span>
+            <p style="margin: 0;">"Arjun, skip that Zomato order to hit your <b>Home Fund</b> 4 days early!"</p>
+        </div>
+
+        <div class="section-label">Credit Cards & Banks</div>
+        <div class="asset-card">
+            <div class="asset-info"><div class="asset-icon" style="background: #fee2e2;">💳</div><div><b>HDFC Regalia</b><br><small style="color: var(--danger);">Due in 3 days</small></div></div>
+            <div class="amt">₹42,000</div>
+        </div>
+        <div class="asset-card">
+            <div class="asset-info"><div class="asset-icon" style="background: #e0e7ff;">🏦</div><div><b>All Banks (3)</b><br><small>Linked via AA</small></div></div>
+            <div class="amt">₹1.2L</div>
+        </div>
+
+        <div class="section-label">Investments</div>
+        <div class="asset-card">
+            <div class="asset-info"><div class="asset-icon" style="background: #fef3c7;">🟡</div><div><b>Gold Wealth</b></div></div>
+            <div class="amt">₹39,300</div>
+        </div>
+        <div class="asset-card">
+            <div class="asset-info"><div class="asset-icon" style="background: #ddd6fe;">🚀</div><div><b>Crypto (BTC)</b></div></div>
+            <div class="amt">0.04 BTC</div>
         </div>
     </div>
 
-    <div class="main-card">
-        <div class="guilt-free">
-            <span style="font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: bold;">Guilt-Free Today</span>
-            <span class="amt" id="safeAmt">₹2,450</span>
-        </div>
+    <div id="wealthScreen" class="screen">
+        <div class="header-slim"><h2>Wealth 📈</h2></div>
         
-        <div style="margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 15px;">
-            <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px;">
-                <b>Unified Safety Net</b>
-                <span style="color: var(--safe-green);">164 Days Secure</span>
-            </div>
-            <div style="height: 8px; background: #eee; border-radius: 10px; overflow: hidden;">
-                <div style="height: 100%; background: var(--safe-green); width: 75%;"></div>
-            </div>
+        <div class="section-label">Stocks Portfolio</div>
+        <div class="asset-card">
+            <div class="asset-info"><div><b>NIFTY 50 ETF</b><br><small>124 Units</small></div></div>
+            <div class="amt">₹2.4L<br><span class="sub-amt" style="color: var(--success);">+₹4,200 (1.8%)</span></div>
+        </div>
+        <div class="asset-card">
+            <div class="asset-info"><div><b>RELIANCE</b><br><small>45 Units</small></div></div>
+            <div class="amt">₹1.1L<br><span class="sub-amt" style="color: var(--danger);">-₹1,100 (0.9%)</span></div>
+        </div>
+
+        <div class="section-label">Mutual Funds & SIPs</div>
+        <div class="asset-card">
+            <div class="asset-info"><div class="asset-icon" style="background: #dcfce7;">📈</div><div><b>Quant Small Cap</b><br><small>Active SIP: ₹5,000</small></div></div>
+            <div class="amt">₹84,000<br><span class="sub-amt">Next: Jan 5</span></div>
+        </div>
+        <div class="asset-card">
+            <div class="asset-info"><div class="asset-icon" style="background: #dcfce7;">📉</div><div><b>Parag Parikh Flexi</b><br><small>Active SIP: ₹10,000</small></div></div>
+            <div class="amt">₹3.1L<br><span class="sub-amt">Next: Jan 12</span></div>
         </div>
     </div>
 
-    <div class="buddy-wins">
-        🤝 <b>Buddy Win:</b> Your friend Rahul just hit a 100-day safety streak!
+    <div id="missionsScreen" class="screen">
+        <div class="header-slim"><h2>Missions 🎯</h2></div>
+        
+        <div class="section-label">Active Missions</div>
+        <div class="mission-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <span style="font-size: 24px;">🏠</span>
+                    <b>Home Fund</b>
+                </div>
+                <span style="font-weight: 800;">65%</span>
+            </div>
+            <div class="progress-container"><div class="progress-fill" style="width: 65%;"></div></div>
+            <p style="font-size: 11px; color: #64748b; margin: 0;">Target: ₹50L | Current: ₹32.5L</p>
+        </div>
+
+        <div class="mission-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <span style="font-size: 24px;">🛡️</span>
+                    <b>Family Shield</b>
+                </div>
+                <span style="font-weight: 800;">164 Days</span>
+            </div>
+            <div class="progress-container"><div class="progress-fill" style="width: 80%; background: var(--success);"></div></div>
+            <p style="font-size: 11px; color: #64748b; margin: 0;">Goal: 6 months of expenses secured</p>
+        </div>
+
+        <div class="section-label">Tax Saving Advice</div>
+        <div class="mission-card" style="border-left: 4px solid var(--primary);">
+            <p style="font-size: 13px; margin: 0;">You have <b>₹45,000</b> left in your 80C limit. Investing in ELSS funds today could save you <b>₹13,500</b> in taxes.</p>
+        </div>
     </div>
 
-    <div class="folder-tab">
-        <h4 style="margin: 0 0 15px 0;">Unified Transaction Folder</h4>
-        <div class="txn-item">
-            <div style="display: flex; gap: 15px; align-items: center;">
-                <div class="txn-icon">🛒</div>
-                <div><b>Zomato</b><br><small style="color: #94a3b8;">Today, 2:15 PM • UPI</small></div>
-            </div>
-            <b style="color: var(--danger-red);">- ₹450</b>
-        </div>
-        <div class="txn-item">
-            <div style="display: flex; gap: 15px; align-items: center;">
-                <div class="txn-icon">🟡</div>
-                <div><b>Gold Wealth</b><br><small style="color: #94a3b8;">Yesterday • SIP</small></div>
-            </div>
-            <b style="color: var(--safe-green);">+ ₹2,000</b>
-        </div>
+    <div id="voiceOverlay">
+        <div style="width: 80px; height: 80px; background: white; border-radius: 50%; animation: pulse 1.5s infinite; opacity: 0.6;"></div>
+        <h2 style="margin-top: 30px;">Listening...</h2>
+        <p id="voiceText" style="font-style: italic; opacity: 0.8;">"Pay 500 to Grocery Store"</p>
     </div>
 
-    <div class="buddy-dock">
-        <button class="btn-action" style="background: var(--danger-red);" onclick="startVoice()">🎙️</button>
-        <div class="buddy-input">
-            <input type="text" id="buddyIn" placeholder="Sarthi, pay ₹20 for milk...">
-        </div>
-        <button class="btn-action" style="background: var(--buddy-indigo);" onclick="handleBuddy()">Pay</button>
+    <div class="nav-bar" id="nav">
+        <div class="nav-item active-nav" onclick="tab('homeScreen', this)">🏠</div>
+        <div class="nav-item" onclick="tab('wealthScreen', this)">📊</div>
+        <div class="nav-item" onclick="startVoice()">🎙️</div>
+        <div class="nav-item" onclick="tab('missionsScreen', this)">🎯</div>
+        <div class="nav-item" onclick="alert('Family Consolidated View: Linking Spouse Assets...')">👨‍👩‍👧</div>
     </div>
 
     <script>
-        function handleBuddy() {
-            const val = document.getElementById('buddyIn').value.toLowerCase();
-            
-            if(val.includes('buy') || val.includes('pay')) {
-                activateImpulseShield();
-            } else if(val.includes('save') || val.includes('skip')) {
-                confetti();
-                alert("Sarthi Buddy: 'Boom! 🚀 That ₹100 is now in your Gold Wealth. Streak extended!'");
-            } else {
-                alert("Sarthi Buddy: 'I'm here! Want to check your Safe Spend or pay someone?'");
-            }
-            document.getElementById('buddyIn').value = '';
+        function unlock() {
+            const pin = document.getElementById('pinInput').value;
+            if(pin.length === 4) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('homeScreen').classList.add('active');
+                document.getElementById('nav').style.display = 'flex';
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            } else { alert("Please enter a 4-digit PIN."); }
         }
 
-        function activateImpulseShield() {
-            const shield = document.getElementById('shieldTimer');
-            const secSpan = document.getElementById('seconds');
-            let timeLeft = 30;
-            
-            shield.style.display = 'block';
-            const timer = setInterval(() => {
-                timeLeft--;
-                secSpan.innerText = timeLeft;
-                if(timeLeft <= 0) {
-                    clearInterval(timer);
-                    shield.style.display = 'none';
-                    alert("Shield Lifted. Sarthi Buddy: 'This move reduces your safety net by 2 days. Proceed with UPI?'");
-                }
-            }, 1000);
+        function tab(id, el) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active-nav'));
+            el.classList.add('active-nav');
         }
 
         function startVoice() {
-            const voices = ["Paying the milkman...", "Checking your Home Fund...", "Can you afford this biryani? Checking..."];
-            const randomVoice = voices[Math.floor(Math.random() * voices.length)];
-            alert("Buddy is listening (Regional Support Active)... Hearing: '" + randomVoice + "'");
+            const v = document.getElementById('voiceOverlay');
+            v.style.display = 'flex';
+            setTimeout(() => { document.getElementById('voiceText').innerText = "Processing UPI Transfer..."; }, 2000);
+            setTimeout(() => { v.style.display = 'none'; confetti(); alert("Payment Successful!"); }, 4000);
         }
     </script>
 </body>
 </html>
+     
+
+  
