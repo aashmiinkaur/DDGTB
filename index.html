@@ -3,204 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sarthi: Emotional Money Companion</title>
+    <title>Sarthi 2.0: The Indian Money Companion</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
     <style>
         :root {
-            --primary: #FF9933; /* Indian Saffron - Energy */
-            --success: #138808; /* Indian Green - Growth */
-            --buddy-blue: #000080; /* Ashoka Blue - Trust */
-            --bg: #f8f9fe;
+            --primary-saffron: #FF9933; 
+            --growth-green: #138808; 
+            --trust-navy: #000080; 
+            --bg-soft: #f4f7fa;
+            --danger-red: #d32f2f;
         }
 
         body { 
-            font-family: -apple-system, sans-serif; 
-            background-color: var(--bg); margin: 0; padding-bottom: 80px;
-            transition: filter 0.5s ease;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background-color: var(--bg-soft); margin: 0; padding-bottom: 100px;
+            transition: filter 0.6s ease;
         }
 
-        body.grayscale-mode { filter: grayscale(100%); }
+        body.shield-mode { filter: grayscale(100%) contrast(1.1); }
 
-        /* Nudge Hub */
-        .nudge-header { 
-            background: linear-gradient(135deg, var(--buddy-blue), #2196F3); 
-            color: white; padding: 25px 20px; border-radius: 0 0 30px 30px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        /* 1. Family Runway Header */
+        .runway-header { 
+            background: linear-gradient(135deg, var(--trust-navy), #1a237e); 
+            color: white; padding: 40px 20px 50px 20px; border-radius: 0 0 40px 40px;
+            text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
+        .runway-count { font-size: 64px; font-weight: 900; display: block; line-height: 1; }
+        .runway-unit { font-size: 14px; opacity: 0.8; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; }
+        .runway-subtext { font-size: 11px; margin-top: 15px; opacity: 0.6; font-style: italic; }
 
         .card { 
-            background: white; margin: 15px; padding: 20px; border-radius: 20px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative;
+            background: white; margin: 15px; padding: 22px; border-radius: 28px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06); position: relative;
         }
 
-        /* Mood Chips */
-        .mood-container { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
-        .mood-chip { 
-            padding: 10px 18px; border-radius: 20px; background: white; border: 1.5px solid #eee;
-            font-size: 13px; white-space: nowrap; cursor: pointer; transition: 0.3s;
+        .overlap-top { margin-top: -35px !important; z-index: 10; }
+
+        /* 2. Emotional Mood Engine */
+        .mood-box { display: flex; gap: 12px; overflow-x: auto; padding: 10px 0; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .mood-btn { 
+            flex: 0 0 auto; padding: 12px 20px; border-radius: 25px; background: #f0f2f5; 
+            border: 2px solid transparent; font-size: 13px; cursor: pointer; transition: 0.3s;
         }
-        .mood-chip.active { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
+        .mood-btn.active { background: var(--primary-saffron); color: white; border-color: #fb8c00; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(255,153,51,0.3); }
 
-        /* Unified Asset List */
-        .asset-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f5f5f5; }
-        .asset-label { font-size: 14px; font-weight: 500; }
-        .asset-val { font-family: 'Courier New', monospace; font-weight: bold; color: var(--buddy-blue); }
+        /* 3. Wealth Map (Indian Context) */
+        .asset-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #f0f0f0; }
+        .asset-info { font-size: 14px; display: flex; align-items: center; gap: 10px; font-weight: 500; }
+        .asset-val { font-family: 'Courier New', monospace; font-weight: 700; color: var(--trust-navy); }
+        .gold-tag { border-left: 5px solid #FFD700; padding-left: 12px; margin-left: -12px; }
 
-        /* Progress Bar */
-        .progress-container { height: 8px; background: #eee; border-radius: 4px; margin: 10px 0; }
-        .progress-fill { height: 100%; background: var(--success); border-radius: 4px; transition: 1s; }
-
-        /* Buttons */
-        .btn-pulse { width: 100%; padding: 16px; background: var(--buddy-blue); color: white; border: none; border-radius: 15px; font-weight: bold; font-size: 16px; margin-top: 10px; }
-        .btn-save { background: var(--success); color: white; flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: bold; }
-        .btn-spend { background: #f5f5f5; color: #666; flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: bold; }
-
-        input { width: 100%; padding: 14px; margin: 8px 0; border: 1.5px solid #eee; border-radius: 12px; box-sizing: border-box; font-size: 16px; }
+        /* 4. Pulse Check (Impulse Control) */
+        input { width: 100%; padding: 16px; margin: 10px 0; border: 2px solid #eee; border-radius: 16px; font-size: 16px; box-sizing: border-box; }
+        .btn-check { width: 100%; padding: 18px; background: var(--trust-navy); color: white; border: none; border-radius: 18px; font-weight: 700; font-size: 16px; cursor: pointer; }
         
-        /* Bottom Nav */
-        .nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; border-top: 1px solid #eee; z-index: 100; }
-        .nav-item { flex: 1; text-align: center; padding: 15px; font-size: 11px; color: #999; }
-        .nav-item.active { color: var(--buddy-blue); font-weight: bold; }
+        .nudge-overlay { 
+            background: #fff9c4; border: 2px solid var(--primary-saffron); padding: 20px; 
+            border-radius: 22px; margin-top: 20px; display: none;
+        }
+
+        /* Family Auditor Tile */
+        .family-pill { background: #e3f2fd; display: flex; align-items: center; gap: 15px; padding: 15px; border-radius: 20px; margin-top: 15px; }
+        .initials { width: 45px; height: 45px; background: var(--trust-navy); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; }
+
+        /* Navigation */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; border-top: 1px solid #eee; padding: 12px 0; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); }
+        .nav-btn { flex: 1; text-align: center; font-size: 11px; color: #aaa; text-decoration: none; font-weight: 600; }
+        .nav-btn.active { color: var(--trust-navy); }
     </style>
 </head>
 <body>
 
-    <div class="nudge-header">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2 style="margin: 0; font-size: 20px;">Namaste, Arjun 🙏</h2>
-            <div id="lang-toggle" style="font-size: 12px; background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 10px;">EN | हिंदी</div>
-        </div>
-        <p id="main-nudge" style="margin: 15px 0; font-size: 15px; line-height: 1.4; opacity: 0.95;">
-            "Analyzing your safety net... You have <b>₹42,000</b> in surplus this month. Shall we move it to your <b>'Sister's Wedding'</b> Gold SIP?"
-        </p>
-        <div class="progress-container"><div class="progress-fill" style="width: 58%;"></div></div>
-        <div style="display: flex; justify-content: space-between; font-size: 11px;">
-            <span>🛡️ Safety: 58% Secure</span>
-            <span>Target: 6 Months Runway</span>
-        </div>
+    <div class="runway-header">
+        <span class="runway-unit">Family Safety Runway</span>
+        <span class="runway-count" id="runway-display">164</span>
+        <span class="runway-unit">Days of Freedom</span>
+        <p class="runway-subtext">Calculated on ₹1,500 daily household burn rate</p>
     </div>
 
-    <div class="card" style="margin-top: -20px;">
-        <h5 style="margin: 0 0 10px 0; color: #555;">How is your heart feeling today?</h5>
-        <div class="mood-container">
-            <div class="mood-chip active" onclick="setMood('Calm', this)">😌 Shanti (Calm)</div>
-            <div class="mood-chip" onclick="setMood('Stressed', this)">😰 Family Pressure</div>
-            <div class="mood-chip" onclick="setMood('Excited', this)">🤑 Salary High!</div>
-            <div class="mood-chip" onclick="setMood('Bored', this)">🥱 Just Browsing</div>
+    <div class="card overlap-top">
+        <h5 style="margin: 0 0 12px 0; color: #444;">Arjun, how are you feeling today?</h5>
+        <div class="mood-box">
+            <div class="mood-btn active" onclick="updateMood('Calm', this)">😌 Shanti</div>
+            <div class="mood-btn" onclick="updateMood('Stressed', this)">😰 Overwhelmed</div>
+            <div class="mood-btn" onclick="updateMood('Excited', this)">🤑 Salary Day!</div>
+            <div class="mood-btn" onclick="updateMood('Bored', this)">🥱 Bored</div>
         </div>
     </div>
 
     <div class="card">
-        <h3 style="margin: 0;">🛒 Pulse Check</h3>
-        <p style="font-size: 12px; color: #777;">Before you scan that QR code, let's look at the impact.</p>
-        <input type="text" id="item-name" placeholder="What are you buying? (e.g. Starbucks, Myntra)">
-        <input type="number" id="item-price" placeholder="Amount (₹)">
-        <button class="btn-pulse" onclick="runNudge()">Check Life-Impact</button>
+        <h3 style="margin: 0 0 5px 0;">🛒 Pulse Check</h3>
+        <p style="font-size: 12px; color: #777; margin-bottom: 15px;">Pause. Look at the impact before you scan.</p>
+        
+        <input type="text" id="itemName" placeholder="What's the treat? (e.g., iPhone Case, Swiggy)">
+        <input type="number" id="itemPrice" placeholder="Price (₹)">
+        <button class="btn-check" onclick="processNudge()">Analyze Life-Cost</button>
 
-        <div id="nudge-overlay" style="display: none; margin-top: 20px; padding: 15px; background: #fff8e1; border-radius: 15px; border-left: 5px solid var(--primary);">
-            <p id="nudge-msg" style="font-size: 14px; color: #333; line-height: 1.4;"></p>
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button class="btn-save" onclick="resolve('save')">Move to SIP</button>
-                <button class="btn-spend" onclick="resolve('spend')">I need this</button>
+        <div id="nudgeSection" class="nudge-overlay">
+            <h4 style="margin: 0; color: var(--danger-red);">⚠️ "Log Kehenge" Logic Filter</h4>
+            <p id="nudgeText" style="font-size: 14px; color: #333; line-height: 1.5; margin: 15px 0;"></p>
+            
+            <div style="background: white; padding: 15px; border-radius: 12px; font-size: 12px; margin-bottom: 15px; border-left: 4px solid var(--primary-saffron);">
+                <b>Think:</b> Is this spend moving you closer to your "Home Downpayment" or just a 15-minute thrill?
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button onclick="resolve('save')" style="background: var(--growth-green); color: white; border: none; padding: 15px; border-radius: 12px; flex: 1; font-weight: bold;">Invest Instead</button>
+                <button onclick="resolve('spend')" style="background: #f5f5f5; color: #666; border: none; padding: 15px; border-radius: 12px; flex: 1; font-weight: bold;">I need this</button>
             </div>
         </div>
     </div>
 
     <div class="card">
-        <h4 style="margin: 0 0 15px 0; display: flex; justify-content: space-between;">
-            Wealth Summary <span>₹3,84,500</span>
-        </h4>
-        <div style="height: 150px; margin-bottom: 20px;">
-            <canvas id="assetChart"></canvas>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h4 style="margin: 0;">Family Wealth Map</h4>
+            <span style="font-size: 11px; background: #e8f5e9; color: var(--growth-green); padding: 4px 10px; border-radius: 10px; font-weight: bold;">UP ₹4,200</span>
+        </div>
+
+        <div style="height: 160px; margin-bottom: 15px;">
+            <canvas id="wealthChart"></canvas>
+        </div>
+
+        <div class="asset-row">
+            <div class="asset-info">🏦 SBI Savings</div>
+            <div class="asset-val">₹65,200</div>
+        </div>
+        <div class="asset-row gold-tag">
+            <div class="asset-info">🟡 Physical Gold & SGB</div>
+            <div class="asset-val">₹39,300</div>
         </div>
         <div class="asset-row">
-            <span class="asset-label">🏦 SBI / HDFC Savings</span>
-            <span class="asset-val">₹65,200</span>
+            <div class="asset-info">📈 SIP (Large Cap)</div>
+            <div class="asset-val">₹2,80,000</div>
         </div>
-        <div class="asset-row">
-            <span class="asset-label">📈 Mutual Funds (SIP)</span>
-            <span class="asset-val">₹2,80,000</span>
+
+        <div class="family-pill">
+            <div class="initials">P</div>
+            <div style="flex-grow: 1;">
+                <div style="font-size: 13px; font-weight: bold;">Auditor: Papa</div>
+                <div style="font-size: 11px; color: #555;">Visibility: Safety Net & Goals only</div>
+            </div>
+            <div style="color: var(--growth-green); font-weight: bold;">ACTIVE</div>
         </div>
-        <div class="asset-row">
-            <span class="asset-label">🟡 Digital Gold</span>
-            <span class="asset-val">₹39,300</span>
-        </div>
-        <button style="width: 100%; background: none; border: 1.5px dashed #ccc; color: #888; padding: 10px; border-radius: 10px; margin-top: 15px; font-size: 12px;">
-            + Link via Account Aggregator (AA)
+
+        <button style="background: none; border: 2px dashed #ddd; color: #999; width: 100%; padding: 12px; border-radius: 15px; margin-top: 20px; font-size: 12px; font-weight: 600;">
+            + Connect Bank via AA Framework
         </button>
     </div>
 
-    <div class="nav">
-        <div class="nav-item active">🏠 Sarthi</div>
-        <div class="nav-item">📊 Portfolio</div>
-        <div class="nav-item">🛡️ Shield</div>
-        <div class="nav-item">👥 Family</div>
+    <div class="bottom-nav">
+        <a href="#" class="nav-btn active">🏠 Sarthi</a>
+        <a href="#" class="nav-btn">📊 Wealth</a>
+        <a href="#" class="nav-btn">🛡️ Shield</a>
+        <a href="#" class="nav-btn">👥 Family</a>
     </div>
 
     <script>
-        let hourlyWage = 450; // Average young professional hourly rate
+        const DAILY_BURN = 1500;
+        const HOURLY_RATE = 450;
+        let totalSavings = 384500;
 
-        function setMood(mood, el) {
-            document.querySelectorAll('.mood-chip').forEach(c => c.classList.remove('active'));
+        // Initialize Runway
+        document.getElementById('runway-display').innerText = Math.floor(totalSavings / DAILY_BURN);
+
+        function updateMood(mood, el) {
+            document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
             el.classList.add('active');
-            const nudge = document.getElementById('main-nudge');
-            
             if(mood === 'Stressed') {
-                nudge.innerHTML = "I hear you. When things are heavy at home, we tend to spend for comfort. I've activated <b>Shield Mode</b> to protect your savings today.";
-                document.body.classList.add('grayscale-mode');
-            } else if(mood === 'Excited') {
-                nudge.innerHTML = "Salary high! 🤑 It's tempting to splurge. Let's lock ₹5k into your <b>Emergency Fund</b> first so you can party guilt-free!";
-                document.body.classList.remove('grayscale-mode');
+                document.body.classList.add('shield-mode');
+                alert("Shield Mode ON: Logic filters will be stricter today to prevent stress-spending.");
             } else {
-                nudge.innerHTML = "You're in a good headspace. Your <b>Safety Net</b> is 58% full. On track to reach your goal by Diwali!";
-                document.body.classList.remove('grayscale-mode');
+                document.body.classList.remove('shield-mode');
             }
         }
 
-        function runNudge() {
-            const name = document.getElementById('item-name').value;
-            const price = document.getElementById('item-price').value;
+        function processNudge() {
+            const price = document.getElementById('itemPrice').value;
+            const name = document.getElementById('itemName').value;
             if(!price) return;
 
-            const hours = (price / hourlyWage).toFixed(1);
-            const msg = document.getElementById('nudge-msg');
-            msg.innerHTML = `Arjun, this <b>${name}</b> costs <b>${hours} hours</b> of your hard work. 🛋️<br><br>It also pushes your <b>'New Laptop'</b> goal back by 12 days. Do you really want to scan this QR?`;
+            const daysLost = (price / DAILY_BURN).toFixed(1);
+            const hoursWorked = (price / HOURLY_RATE).toFixed(1);
+
+            const nudgeBox = document.getElementById('nudgeSection');
+            const nudgeText = document.getElementById('nudgeText');
+
+            nudgeText.innerHTML = `Arjun, this <b>${name}</b> costs you <b>${hoursWorked} hours</b> of labor. 🛋️<br><br>Buying this kills <b>${daysLost} days</b> of your Family Safety Runway.`;
             
-            document.getElementById('nudge-overlay').style.display = 'block';
+            nudgeBox.style.display = 'block';
+            nudgeBox.scrollIntoView({ behavior: 'smooth' });
         }
 
-        function resolve(type) {
-            if(type === 'save') {
-                confetti();
-                alert("Smart choice! ₹" + document.getElementById('item-price').value + " redirected to your Wealth Pot.");
+        function resolve(choice) {
+            if(choice === 'save') {
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                alert("Great choice! Redirecting funds to your 'Parents' Health' pot.");
             }
-            document.getElementById('nudge-overlay').style.display = 'none';
-            document.getElementById('item-name').value = '';
-            document.getElementById('item-price').value = '';
+            document.getElementById('nudgeSection').style.display = 'none';
+            document.getElementById('itemPrice').value = '';
+            document.getElementById('itemName').value = '';
         }
 
-        // India-focused Asset Chart
-        const ctx = document.getElementById('assetChart').getContext('2d');
+        // Initialize Wealth Chart
+        const ctx = document.getElementById('wealthChart').getContext('2d');
         new Chart(ctx, {
             type: 'doughnut',
             data: {
                 labels: ['Cash', 'Mutual Funds', 'Gold'],
                 datasets: [{
                     data: [65200, 280000, 39300],
-                    backgroundColor: ['#2196F3', '#138808', '#FF9933'],
-                    borderWidth: 0,
-                    hoverOffset: 4
+                    backgroundColor: ['#2196F3', '#138808', '#FFCC00'],
+                    hoverOffset: 10,
+                    borderWidth: 0
                 }]
             },
             options: {
                 maintainAspectRatio: false,
-                plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } }
+                plugins: {
+                    legend: { position: 'right', labels: { boxWidth: 15, font: { size: 11, weight: '600' } } }
+                },
+                cutout: '70%'
             }
         });
     </script>
 </body>
 </html>
-            
+   
