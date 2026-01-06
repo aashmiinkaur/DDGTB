@@ -1,219 +1,1116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sarthi - Your Financial Co-Pilot</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        [x-cloak] { display: none !important; }
-        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
-        .red-spend { background-color: #fee2e2; border-left: 4px solid #ef4444; }
-        .green-save { background-color: #dcfce7; border-left: 4px solid #22c55e; }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Spark + Sarthi Finance — Working Prototype</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    /* ===== THEME: Warm bright, friendly, gamified ===== */
+    :root{
+      --bg1:#fff3e0;        /* soft peach */
+      --bg2:#ffe0b2;        /* light apricot */
+      --bg3:#ffcc80;        /* warm amber */
+      --primary:#ff9800;    /* orange */
+      --primary-dark:#e65100;
+      --accent:#ff7043;     /* coral */
+      --text:#333;
+      --card:#fff8e1;
+      --ok:#43a047;
+      --warn:#fb8c00;
+      --bad:#e53935;
+      --soft:#fbe9e7;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background: linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 50%, var(--bg3) 100%);
+    }
+    h1,h2,h3{margin:0 0 10px 0}
+    p{margin:6px 0}
+    .app{display:flex;flex-direction:column;min-height:100vh}
+
+    /* ===== Top Navigation (vertical app-style with sticky header) ===== */
+    .nav{
+      position:sticky; top:0; z-index:100;
+      display:flex; flex-wrap:wrap; justify-content:center; gap:8px;
+      background:var(--primary);
+      padding:10px;
+      box-shadow:0 4px 12px rgba(0,0,0,.1);
+    }
+    .nav button{
+      border:none; cursor:pointer; font-weight:600;
+      padding:10px 14px; border-radius:999px;
+      background:#fff3e0; color:var(--primary-dark);
+    }
+    .nav button.active{background:var(--bg3); color:#bf360c}
+
+    /* ===== Screens stacked vertically ===== */
+    .screen{display:none; padding:16px 16px 24px}
+    .screen.active{display:block}
+
+    /* ===== Cards & UI elements ===== */
+    .card{
+      background:var(--card);
+      border-radius:16px;
+      padding:16px;
+      margin:12px 0;
+      box-shadow:0 6px 16px rgba(255,140,0,.2);
+    }
+    .card h3{margin-bottom:6px}
+    .chip{
+      display:inline-block; background:var(--bg2);
+      padding:6px 10px; border-radius:999px; font-size:12px; margin:4px 6px 0 0;
+    }
+    .pill{
+      display:inline-block; background:var(--bg3);
+      padding:6px 10px; border-radius:999px; font-size:12px; margin:4px 6px 0 0;
+    }
+    .btn{
+      display:inline-block; border:none; cursor:pointer;
+      padding:10px 14px; border-radius:12px; font-weight:600;
+      background:var(--primary); color:#fff; margin:4px 6px 0 0;
+    }
+    .btn.ghost{background:var(--bg2); color:var(--primary-dark)}
+    .btn.small{padding:8px 12px; font-size:13px}
+    .row{display:flex; justify-content:space-between; align-items:center; gap:8px}
+    .grid{display:grid; gap:12px}
+    .grid.cols-2{grid-template-columns:repeat(2,1fr)}
+    .grid.cols-3{grid-template-columns:repeat(3,1fr)}
+    .progress{height:10px; background:var(--bg2); border-radius:999px; overflow:hidden}
+    .progress span{display:block; height:100%; background:var(--primary)}
+    input,select,textarea{
+      width:100%; padding:10px; border-radius:12px; border:1px solid var(--bg3); margin:6px 0; background:#fff
+    }
+    .tabs{display:flex; flex-wrap:wrap; gap:8px; margin:8px 0}
+    .tab{background:var(--bg2); padding:6px 12px; border-radius:999px; cursor:pointer}
+    .tab.active{background:var(--bg3)}
+    .bubble{background:#fff3e0; padding:10px; border-radius:12px; margin:6px 0; max-width:75%}
+    .bubble.me{margin-left:auto; background:var(--bg2)}
+    .badge{display:inline-block; background:var(--soft); border:1px dashed var(--accent); color:var(--primary-dark); padding:8px 10px; border-radius:12px; margin:6px 6px 0 0}
+    .list-item{padding:8px 0; border-bottom:1px dashed var(--bg3)}
+    .muted{opacity:.8}
+    .ok{color:var(--ok)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+    .section-title{font-size:18px; font-weight:700; margin-bottom:8px}
+    .sub{font-size:13px; opacity:.8}
+
+    /* ===== Responsive ===== */
+    @media (min-width:900px){
+      .screen{max-width:900px; margin:0 auto}
+    }
+  </style>
 </head>
-<body class="bg-slate-50 font-sans text-slate-900" x-data="{ 
-    tab: 'cockpit', 
-    showGuide: true, 
-    showBot: false,
-    trustScore: 720,
-    guiltFree: 4500,
-    spendingStatus: 'normal',
-    savingsProgress: 65
-}">
+<body>
+<div class="app">
 
-    <div x-show="showGuide" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6">
-        <div class="glass max-w-sm rounded-3xl p-8 text-center shadow-2xl">
-            <div class="mb-4 text-4xl text-blue-600"><i class="fas fa-lightbulb"></i></div>
-            <h2 class="mb-2 text-2xl font-bold">Welcome to Sarthi</h2>
-            <p class="mb-6 text-slate-600 text-sm italic text-left">
-                "I track your behavior, not just your balance. Look for the Trust Meter to unlock your fund!"
-            </p>
-            <ul class="text-left text-xs space-y-2 mb-6">
-                <li><i class="fas fa-check text-green-500 mr-2"></i> <b>Cockpit:</b> Your funds at a glance.</li>
-                <li><i class="fas fa-shield-halved text-blue-500 mr-2"></i> <b>Family:</b> Share only what you want.</li>
-                <li><i class="fas fa-seedling text-orange-500 mr-2"></i> <b>Fund:</b> Upload work photos to unlock cash.</li>
-            </ul>
-            <button @click="showGuide = false" class="w-full rounded-xl bg-blue-600 py-3 font-bold text-white shadow-lg">Start Journey</button>
+  <!-- ===== Navigation ===== -->
+  <div class="nav">
+    <button class="active" data-target="login">Login</button>
+    <button data-target="signup">Signup</button>
+    <button data-target="spark">Secure Access</button>
+    <button data-target="money">Money Match</button>
+    <button data-target="post">Create Post</button>
+    <button data-target="profile">Profile</button>
+    <button data-target="dashboard">Dashboard</button>
+    <button data-target="mymoney">My Money</button>
+    <button data-target="spending">Spending</button>
+    <button data-target="learn">Learn & Protect</button>
+    <button data-target="secure">Security Center</button>
+    <button data-target="goals">Goals</button>
+    <button data-target="mentor">Mentor</button>
+    <button data-target="achievements">Achievements</button>
+    <button data-target="charges">Hidden Charges</button>
+  </div>
+
+  <!-- ===== Login (Spark Finance: Secure Access Portal options) ===== -->
+  <section id="login" class="screen active">
+    <h2>Login</h2>
+    <div class="card">
+      <p class="sub">Secure Access Portal</p>
+      <div class="row">
+        <button class="btn">Google Login</button>
+        <span class="chip">Preview mode: auto-login allowed</span>
+      </div>
+      <div class="grid cols-2">
+        <div>
+          <h3>Email & Password</h3>
+          <input type="email" placeholder="Email" />
+          <input type="password" placeholder="Password" />
+          <button class="btn">Login</button>
         </div>
+        <div>
+          <h3>Phone Number</h3>
+          <input type="tel" placeholder="Phone" />
+          <button class="btn">Login via OTP</button>
+        </div>
+      </div>
+      <div class="row">
+        <span class="pill">ENCRYPTION</span>
+        <span class="pill">GDPR COMPLIANT</span>
+        <span class="pill">SOC2 CERTIFIED</span>
+      </div>
+      <p class="chip">“The most powerful force in the universe is compound interest.” — Albert Einstein</p>
+      <div class="row">
+        <span class="badge">10K+ Active Users</span>
+        <span class="badge">$5M+ Assets Managed</span>
+        <span class="badge">99.9% Uptime</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Signup ===== -->
+  <section id="signup" class="screen">
+    <h2>Signup</h2>
+    <div class="card">
+      <p>Create your account</p>
+      <input type="text" placeholder="Full name" />
+      <input type="email" placeholder="Email" />
+      <input type="password" placeholder="Password" />
+      <button class="btn">Create Account</button>
+    </div>
+  </section>
+
+  <!-- ===== Spark Finance: Secure Access (branding summary) ===== -->
+  <section id="spark" class="screen">
+    <h2>Spark Finance — Secure Access</h2>
+    <div class="card">
+      <p>Future-Proof Your Wealth. Where financial intelligence meets digital elegance.</p>
+      <div class="row">
+        <span class="pill">Secure Access Portal</span>
+        <span class="pill">Google • Email • Phone</span>
+      </div>
+      <p class="muted">You are in preview mode and can log in automatically. After publication, real information will be required.</p>
+    </div>
+  </section>
+
+  <!-- ===== Money Match (Spark Finance challenges) ===== -->
+  <section id="money" class="screen">
+    <h2>Money Match — Compete. Save. Win.</h2>
+    <div class="row">
+      <button class="btn">Create New Challenge</button>
+      <button class="btn ghost">Refresh</button>
     </div>
 
-    <div class="mx-auto max-w-md bg-white min-h-screen shadow-lg flex flex-col pb-20">
-
-        <header class="p-6 pb-2" :class="spendingStatus === 'over' ? 'bg-red-50' : (savingsProgress > 80 ? 'bg-green-50' : 'bg-white')">
-            <div class="flex items-center justify-between mb-4">
-                <h1 class="text-2xl font-black text-blue-900 tracking-tight">SARTHI</h1>
-                <div class="flex items-center space-x-3">
-                    <span class="text-xs font-bold px-2 py-1 rounded bg-blue-100 text-blue-700">LVL 12</span>
-                    <button @click="showGuide = true" class="text-slate-400"><i class="fas fa-circle-question"></i></button>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 mb-4">
-                <div class="flex justify-between items-end mb-2">
-                    <span class="text-xs font-bold text-slate-500 uppercase">Trust Score (BLI)</span>
-                    <span class="text-xl font-black text-blue-600" x-text="trustScore"></span>
-                </div>
-                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                    <div class="h-full bg-blue-500 transition-all duration-1000" :style="`width: ${trustScore/10}%` text-align: right"></div>
-                </div>
-                <p class="text-[10px] text-slate-400 mt-2 italic">Maintain your 12-day streak to reach 750!</p>
-            </div>
-        </header>
-
-        <main class="flex-1 px-6 overflow-y-auto">
-            
-            <div x-show="tab === 'cockpit'">
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="p-4 rounded-2xl bg-blue-600 text-white shadow-blue-200 shadow-xl">
-                        <p class="text-[10px] opacity-80 uppercase font-bold">Guilt-Free</p>
-                        <p class="text-xl font-bold">₹<span x-text="guiltFree"></span></p>
-                    </div>
-                    <div class="p-4 rounded-2xl bg-white border border-slate-100 shadow-sm">
-                        <p class="text-[10px] text-slate-500 uppercase font-bold">Total Invested</p>
-                        <p class="text-xl font-bold text-slate-800">₹82,400</p>
-                    </div>
-                </div>
-
-                <h3 class="font-bold text-sm mb-3 flex items-center"><i class="fas fa-bolt text-yellow-500 mr-2"></i> Recent Nudges</h3>
-                <div class="space-y-3 mb-6">
-                    <div class="p-3 rounded-xl red-spend flex justify-between items-center" @click="spendingStatus = 'over'">
-                        <div class="text-xs font-medium">Overspent on "Tea/Snacks"</div>
-                        <div class="text-red-600 font-bold">-₹120</div>
-                    </div>
-                    <div class="p-3 rounded-xl green-save flex justify-between items-center" @click="spendingStatus = 'normal'; savingsProgress = 90">
-                        <div class="text-xs font-medium">Saved via "Input Matching"</div>
-                        <div class="text-green-600 font-bold">+₹500</div>
-                    </div>
-                </div>
-
-                <div class="mb-6">
-                    <div class="flex justify-between mb-2">
-                        <span class="text-sm font-bold">Home Fund Goal</span>
-                        <span class="text-xs text-slate-500" x-text="`${savingsProgress}%` text-align: right"></span>
-                    </div>
-                    <div class="h-8 w-full bg-slate-100 rounded-xl p-1 relative">
-                        <div class="h-full rounded-lg transition-all duration-700" 
-                             :class="savingsProgress > 80 ? 'bg-green-500' : 'bg-blue-400'"
-                             :style="`width: ${savingsProgress}%` text-align: right"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div x-show="tab === 'family'" x-cloak>
-                <div class="bg-blue-900 rounded-3xl p-6 text-white mb-6 shadow-xl">
-                    <h2 class="text-xl font-bold mb-1">Family Shield</h2>
-                    <p class="text-xs opacity-70 mb-4 tracking-wide">YOUR RUNWAY PROTECTION</p>
-                    <div class="flex items-center space-x-4">
-                        <div class="text-3xl font-black">4.2 <span class="text-sm font-normal">Months</span></div>
-                        <div class="h-10 w-px bg-white/20"></div>
-                        <p class="text-[10px] leading-relaxed">Your family is safe until April 2026 if all income stops.</p>
-                    </div>
-                </div>
-
-                <h3 class="font-bold text-slate-400 text-xs uppercase mb-4">Privacy Controls</h3>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between p-4 bg-white border rounded-2xl">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold">A</div>
-                            <div>
-                                <p class="text-sm font-bold">Aashmiin (Self)</p>
-                                <p class="text-[10px] text-slate-400">Linked: SBI Bank</p>
-                            </div>
-                        </div>
-                        <div class="flex space-x-2" x-data="{ mode: 'blurred' }">
-                            <button @click="mode = 'full'" :class="mode === 'full' ? 'text-blue-600' : 'text-slate-300'"><i class="fas fa-eye"></i></button>
-                            <button @click="mode = 'blurred'" :class="mode === 'blurred' ? 'text-blue-600' : 'text-slate-300'"><i class="fas fa-eye-slash"></i></button>
-                            <button @click="mode = 'private'" :class="mode === 'private' ? 'text-blue-600' : 'text-slate-300'"><i class="fas fa-lock"></i></button>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between p-4 bg-white border rounded-2xl opacity-60">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">P</div>
-                            <div>
-                                <p class="text-sm font-bold">Prakash (Spouse)</p>
-                                <p class="text-[10px] text-slate-400 italic">Syncing limited amounts</p>
-                            </div>
-                        </div>
-                        <i class="fas fa-user-shield text-slate-400"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div x-show="tab === 'fund'" x-cloak>
-                <div class="p-6 bg-gradient-to-br from-orange-400 to-orange-600 rounded-3xl text-white mb-6">
-                    <p class="text-xs uppercase font-bold opacity-80">Available Liquidity</p>
-                    <h2 class="text-4xl font-black mb-4">₹5,000</h2>
-                    <button class="w-full bg-white text-orange-600 py-3 rounded-xl font-bold shadow-lg">Withdraw to Bank</button>
-                </div>
-
-                <div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center" x-data="{ uploading: false }">
-                    <div x-show="!uploading">
-                        <i class="fas fa-camera text-3xl text-slate-400 mb-2"></i>
-                        <p class="text-xs font-bold text-slate-600">UPLOAD PROOF OF WORK</p>
-                        <p class="text-[10px] text-slate-400 mb-4">Upload harvest photo to unlock ₹2,000 more.</p>
-                        <button @click="uploading = true; setTimeout(() => { uploading = false; trustScore += 5; }, 2000)" 
-                                class="text-xs bg-slate-200 px-4 py-2 rounded-full font-bold">Select Photo</button>
-                    </div>
-                    <div x-show="uploading" x-cloak>
-                        <i class="fas fa-spinner fa-spin text-orange-500 text-2xl mb-2"></i>
-                        <p class="text-[10px] font-bold">Sarthi AI is verifying your work...</p>
-                    </div>
-                </div>
-            </div>
-
-        </main>
-
-        <div class="fixed bottom-24 right-6 z-40">
-            <div x-show="showBot" x-transition x-cloak class="glass w-72 mb-4 rounded-3xl shadow-2xl overflow-hidden border border-blue-100">
-                <div class="bg-blue-600 p-4 text-white text-sm font-bold flex justify-between">
-                    <span>Ask Sarthi AI</span>
-                    <button @click="showBot = false">×</button>
-                </div>
-                <div class="p-4 h-60 overflow-y-auto space-y-3 bg-white/50 text-xs">
-                    <div class="p-2 bg-blue-50 rounded-lg text-blue-900">
-                        Hey! I noticed you saved ₹500 more than last week. This raised your <b>Trust Score</b> by 5 points. Want to know what that unlocks?
-                    </div>
-                    <div class="p-2 bg-white border border-slate-100 rounded-lg text-slate-600 text-right">
-                        What is Guilt-Free balance?
-                    </div>
-                    <div class="p-2 bg-blue-50 rounded-lg text-blue-900">
-                        That's your "Happy Money." It's what you can spend freely because your bills and goals are already safe!
-                    </div>
-                </div>
-                <div class="p-3 bg-white border-t flex space-x-2">
-                    <input type="text" placeholder="Type here..." class="flex-1 text-xs outline-none">
-                    <button class="text-blue-600"><i class="fas fa-paper-plane"></i></button>
-                </div>
-            </div>
-            <button @click="showBot = !showBot" class="w-14 h-14 rounded-full bg-blue-600 text-white shadow-xl flex items-center justify-center text-xl hover:scale-110 transition-transform">
-                <i class="fas fa-robot"></i>
-            </button>
-        </div>
-
-        <nav class="fixed bottom-0 max-w-md w-full glass border-t border-slate-100 flex justify-around p-4 z-30">
-            <button @click="tab = 'cockpit'" :class="tab === 'cockpit' ? 'text-blue-600' : 'text-slate-400'">
-                <i class="fas fa-gauge-high block text-lg"></i>
-                <span class="text-[10px] font-bold">Cockpit</span>
-            </button>
-            <button @click="tab = 'family'" :class="tab === 'family' ? 'text-blue-600' : 'text-slate-400'">
-                <i class="fas fa-users-viewfinder block text-lg"></i>
-                <span class="text-[10px] font-bold">Family</span>
-            </button>
-            <button @click="tab = 'fund'" :class="tab === 'fund' ? 'text-blue-600' : 'text-slate-400'">
-                <i class="fas fa-vault block text-lg"></i>
-                <span class="text-[10px] font-bold">Fund</span>
-            </button>
-        </nav>
+    <div class="card">
+      <h3>No Spend January</h3>
+      <p>Challenge yourself to not spend on non-essential items for January.</p>
+      <div class="row">
+        <span class="chip">Dec 31 - Dec 31</span>
+        <span class="chip">Participants: 1</span>
+        <span class="chip">Not Joined</span>
+      </div>
+      <div class="progress"><span style="width:0%"></span></div>
+      <p class="muted">Creator: Unknown</p>
+      <button class="btn small">Join</button>
     </div>
 
+    <div class="card">
+      <h3>Weekly Saving Sprint</h3>
+      <p>Save a fixed amount every day for one week.</p>
+      <div class="row">
+        <span class="chip">Dec 31 - Dec 31</span>
+        <span class="chip">Participants: 1</span>
+        <span class="chip">Not Joined</span>
+      </div>
+      <div class="progress"><span style="width:0%"></span></div>
+      <p class="muted">Creator: Unknown</p>
+      <button class="btn small">Join</button>
+    </div>
+
+    <div class="card">
+      <h3>Budget Master Challenge</h3>
+      <p>Create and stick to a budget for the month.</p>
+      <div class="row">
+        <span class="chip">Dec 31 - Dec 31</span>
+        <span class="chip">Participants: 1</span>
+        <span class="chip">Not Joined</span>
+      </div>
+      <div class="progress"><span style="width:0%"></span></div>
+      <p class="muted">Creator: Unknown</p>
+      <button class="btn small">Join</button>
+    </div>
+
+    <div class="card">
+      <h3>Debt-Free April</h3>
+      <p>Focus on paying off debts this April.</p>
+      <div class="row">
+        <span class="chip">Dec 31 - Dec 31</span>
+        <span class="chip">Participants: 1</span>
+        <span class="chip">Not Joined</span>
+      </div>
+      <p class="muted">Creator: Unknown</p>
+      <button class="btn small">Join</button>
+    </div>
+
+    <div class="card">
+      <h3>Emergency Fund Boost</h3>
+      <p>Increase your emergency fund by 10%.</p>
+      <div class="row">
+        <span class="chip">Dec 31 - Dec 31</span>
+        <span class="chip">Participants: 1</span>
+        <span class="chip">Not Joined</span>
+      </div>
+      <p class="muted">Creator: Unknown</p>
+      <button class="btn small">Join</button>
+    </div>
+
+    <div class="card">
+      <h3>Investment Kickstart</h3>
+      <p>Start investing with at least $50.</p>
+      <div class="row">
+        <span class="chip">Dec 31 - Dec 31</span>
+        <span class="chip">Participants: 1</span>
+        <span class="chip">Upcoming • Not Joined</span>
+      </div>
+      <p class="muted">Creator: Unknown</p>
+      <button class="btn small">Join</button>
+    </div>
+
+    <div class="card">
+      <h3>Cash Canvas Completion</h3>
+      <p>Complete your cash canvas and share it.</p>
+      <div class="row">
+        <span class="chip">Dec 31 - Dec 31</span>
+        <span class="chip">Participants: 1</span>
+        <span class="chip">Not Joined</span>
+      </div>
+      <p class="muted">Creator: Unknown</p>
+      <button class="btn small">Join</button>
+    </div>
+
+    <div class="card">
+      <h3>Savings Streak Challenge</h3>
+      <p>Maintain a savings streak for 30 days.</p>
+      <div class="row">
+        <span class="chip">Dec 31 - Dec 31</span>
+        <span class="chip">Participants: 1</span>
+        <span class="chip">Not Joined</span>
+      </div>
+      <p class="muted">Creator: Unknown</p>
+      <button class="btn small">Join</button>
+    </div>
+  </section>
+
+  <!-- ===== Create Post (Spark Finance) ===== -->
+  <section id="post" class="screen">
+    <h2>Create Post</h2>
+    <div class="card">
+      <p class="sub">Share your financial journey with the community</p>
+
+      <div class="section-title">Choose Template</div>
+      <div class="tabs" id="postTemplates">
+        <span class="tab active" data-template="Milestone">Milestone</span>
+        <span class="tab" data-template="Tip Share">Tip Share</span>
+        <span class="tab" data-template="Goal Update">Goal Update</span>
+      </div>
+
+      <div class="section-title">AR Filters</div>
+      <div class="tabs" id="arFilters">
+        <span class="tab active" data-filter="Money Rain">Money Rain</span>
+        <span class="tab" data-filter="Gold Glow">Gold Glow</span>
+        <span class="tab" data-filter="Crypto Pulse">Crypto Pulse</span>
+        <span class="tab" data-filter="Stock Wave">Stock Wave</span>
+      </div>
+
+      <div class="grid cols-2">
+        <div>
+          <h3>Images</h3>
+          <p class="muted">Upload up to 10 images</p>
+          <input type="file" multiple accept="image/*" />
+        </div>
+        <div>
+          <h3>Videos</h3>
+          <p class="muted">Upload up to 3 videos</p>
+          <input type="file" multiple accept="video/*" />
+        </div>
+      </div>
+
+      <div class="section-title">Caption</div>
+      <textarea rows="3" placeholder="What's your financial insight today? #FinanceTips #MoneyMindset"></textarea>
+      <p class="muted">AI will enhance your post</p>
+
+      <div class="section-title">Preview</div>
+      <div class="card">
+        <div class="row">
+          <strong>You</strong>
+          <span class="muted">Just now • No filter</span>
+        </div>
+        <p class="muted">Add media to preview</p>
+      </div>
+
+      <div class="row">
+        <button class="btn">Publish</button>
+        <button class="btn ghost">Save Draft</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Profile & Cash Canvas (Spark Finance) ===== -->
+  <section id="profile" class="screen">
+    <h2>Profile</h2>
+    <div class="card">
+      <div class="row">
+        <div>
+          <strong>FinSavvy User</strong>
+          <p class="muted">user@example.com</p>
+          <p class="muted">Member since 12M 2025</p>
+        </div>
+        <div class="row">
+          <span class="badge">0 Posts</span>
+          <span class="badge">14 Day Streak</span>
+          <span class="badge">10 Budgets</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Cash Canvas</h3>
+      <p class="muted">Your dynamic financial landscape</p>
+      <div class="grid cols-2">
+        <div class="list-item">Food — $200</div>
+        <div class="list-item">Entertainment — $100</div>
+        <div class="list-item">Transport — $50</div>
+        <div class="list-item">Savings — $500</div>
+        <div class="list-item">Utilities — $150</div>
+        <div class="list-item">Emergency Fund — $300</div>
+        <div class="list-item">Debt Repayment — $400</div>
+        <div class="list-item">Education — $120</div>
+        <div class="list-item">Health — $80</div>
+        <div class="list-item">Investment — $600</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>My Spark</h3>
+      <p class="muted">Moments shared with the community</p>
+      <button class="btn small">Latest</button>
+    </div>
+
+    <div class="card">
+      <h3>Milestones Unlocked</h3>
+      <p class="muted">Your journey to financial mastery</p>
+      <div class="row">
+        <span class="badge">Savings Streak 7 Days</span>
+        <span class="badge">Savings Streak 14 Days</span>
+        <span class="badge">Savings Streak 21 Days</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Sarthi Dashboard ===== -->
+  <section id="dashboard" class="screen">
+    <h2>Welcome Back! Tuesday, 30 December 2025</h2>
+
+    <div class="card">
+      <h3>Your Money is Safe</h3>
+      <div class="row">
+        <div><strong>95%</strong> Protection</div>
+        <span class="chip">Last Scan: Just now</span>
+        <span class="chip">Active Threats: 0</span>
+        <span class="chip">Protected Accounts: 8</span>
+      </div>
+    </div>
+
+    <div class="grid cols-2">
+      <div class="card">
+        <h3>Emergency Fund</h3>
+        <p>₹45,000</p>
+        <div class="progress"><span style="width:50%"></span></div>
+        <p class="muted">Halfway to your safety goal</p>
+      </div>
+      <div class="card">
+        <h3>Monthly Expenses</h3>
+        <p>₹15,000</p>
+        <p class="muted ok">Under budget this month</p>
+      </div>
+      <div class="card">
+        <h3>Savings Rate</h3>
+        <p>35% (Target: 40%)</p>
+        <div class="progress"><span style="width:35%"></span></div>
+        <p class="muted">Beating market average</p>
+      </div>
+      <div class="card">
+        <h3>Investment Growth</h3>
+        <p>₹1,25,000 (Target: ₹90,000)</p>
+        <div class="progress"><span style="width:87%"></span></div>
+        <p class="muted">Excellent progress</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Financial Runway</h3>
+      <p class="muted">How long your money will last</p>
+      <div class="row">
+        <span class="chip">Current Balance: ₹45,000</span>
+        <span class="chip">Monthly Expenses: ₹15,000</span>
+        <span class="pill ok">Good</span>
+      </div>
+      <p class="muted">Sarthi's Tip: Build your emergency fund to 6 months for better security.</p>
+    </div>
+
+    <div class="card">
+      <h3>Achievement Unlocked!</h3>
+      <p>You've saved ₹1,33,000 this month. Keep up the momentum to unlock exclusive benefits!</p>
+    </div>
+
+    <div class="grid cols-2">
+      <div class="card">
+        <h3>Quick Actions</h3>
+        <div class="row">
+          <button class="btn small">Pay Bill</button>
+          <span class="muted">Electricity bill due in 3 days</span>
+        </div>
+        <div class="row">
+          <button class="btn small">Transfer Funds</button>
+          <span class="muted">Zero fees for transfers under ₹10,000</span>
+        </div>
+        <div class="row">
+          <button class="btn small">Add to Goal</button>
+          <span class="muted">You're ₹5,000 away from your vacation goal</span>
+        </div>
+        <div class="row">
+          <button class="btn small">Track Expense</button>
+          <span class="muted">Keep your spending streak going</span>
+        </div>
+        <p class="muted">Commission-free • Transparent • Personalized</p>
+      </div>
+
+      <div class="card">
+        <h3>Your Financial Journey</h3>
+        <div class="row">
+          <span class="pill">All Activity</span>
+          <span class="pill">Achievements</span>
+          <span class="pill">Transactions</span>
+          <span class="pill">Insights</span>
+        </div>
+        <div class="list-item">Savings Milestone Reached! — 39m ago • You saved ₹5,000 this week (25% more than last week)</div>
+        <div class="list-item">Bill Payment Successful — 2h ago • Electricity bill ₹1,200 paid automatically</div>
+        <div class="list-item">Smart Spending Alert — 4h ago • You're spending 15% less on dining out this month</div>
+        <button class="btn ghost small">View All Activity</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== My Money (Sarthi) ===== -->
+  <section id="mymoney" class="screen">
+    <h2>Your Money Dashboard</h2>
+    <div class="card">
+      <div class="row">
+        <span class="pill">Secure • All systems protected • Just now</span>
+        <button class="btn small">Sync Now</button>
+      </div>
+      <div class="row">
+        <strong>Total Balance: ₹3,95,000</strong>
+        <span class="chip">This Month: +₹12,500</span>
+        <span class="chip">Across 4 accounts</span>
+        <span class="chip bad">Hidden Charges Found</span>
+      </div>
+    </div>
+
+    <div class="grid cols-2">
+      <div class="card">
+        <h3>HDFC Bank • **** 6789</h3>
+        <p>Savings • Available Balance: ₹1,25,000</p>
+        <div class="row">
+          <span class="muted">Synced 5m ago</span>
+          <span class="bad">2 hidden charges</span>
+        </div>
+        <div class="row">
+          <button class="btn small">View Details</button>
+          <button class="btn ghost small">Transfer</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>ICICI Bank • **** 3421</h3>
+        <p>Current • Available Balance: ₹85,000</p>
+        <div class="row">
+          <span class="muted">Synced 10m ago</span>
+          <span class="bad">1 hidden charge</span>
+        </div>
+        <div class="row">
+          <button class="btn small">View Details</button>
+          <button class="btn ghost small">Transfer</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>SBI Credit Card • **** 9012</h3>
+        <p>Credit Card • Available Balance: -₹15,000</p>
+        <div class="row">
+          <span class="muted">Synced 3m ago</span>
+          <span class="bad">3 hidden charges</span>
+        </div>
+        <div class="row">
+          <button class="btn small">View Details</button>
+          <button class="btn ghost small">Transfer</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Axis Bank • **** 5678</h3>
+        <p>Fixed Deposit • Available Balance: ₹2,00,000</p>
+        <div class="row">
+          <span class="muted">Synced 15m ago</span>
+        </div>
+        <div class="row">
+          <button class="btn small">View Details</button>
+          <button class="btn ghost small">Transfer</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Spending Patterns & Recommendations (Sarthi) ===== -->
+  <section id="spending" class="screen">
+    <h2>Spending Patterns — Your money story this month</h2>
+
+    <div class="card">
+      <div class="row">
+        <span class="pill">This Month</span>
+        <span class="bad">Unusual Spending Detected</span>
+      </div>
+      <p>You spent ₹5,000 more on shopping this month compared to your usual pattern. Want to review these transactions?</p>
+      <p class="ok">Holiday Fund Protection Active — Your Diwali savings of ₹15,000 are protected. We'll remind you before any large transactions that might affect this goal.</p>
+    </div>
+
+    <div class="grid cols-2">
+      <div class="card">
+        <h3>Food & Dining</h3>
+        <p>₹12,500 • 25% of total</p>
+        <div class="progress"><span style="width:25%"></span></div>
+      </div>
+      <div class="card">
+        <h3>Shopping</h3>
+        <p>₹10,000 • 20% of total</p>
+        <div class="progress"><span style="width:20%"></span></div>
+      </div>
+      <div class="card">
+        <h3>Transportation</h3>
+        <p>₹7,500 • 15% of total</p>
+        <div class="progress"><span style="width:15%"></span></div>
+      </div>
+      <div class="card">
+        <h3>Entertainment</h3>
+        <p>₹6,000 • 12% of total</p>
+        <div class="progress"><span style="width:12%"></span></div>
+      </div>
+      <div class="card">
+        <h3>Bills & Utilities</h3>
+        <p>₹8,000 • 16% of total</p>
+        <div class="progress"><span style="width:16%"></span></div>
+      </div>
+      <div class="card">
+        <h3>Healthcare</h3>
+        <p>₹3,000 • 6% of total</p>
+        <div class="progress"><span style="width:6%"></span></div>
+      </div>
+      <div class="card">
+        <h3>Education</h3>
+        <p>₹2,000 • 4% of total</p>
+        <div class="progress"><span style="width:4%"></span></div>
+      </div>
+      <div class="card">
+        <h3>Others</h3>
+        <p>₹1,000 • 2% of total</p>
+        <div class="progress"><span style="width:2%"></span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Sarthi's Recommendations</h3>
+      <div class="grid cols-2">
+        <div class="card">
+          <strong>HDFC Liquid Fund</strong>
+          <p>Park your emergency fund here for better returns than savings account</p>
+          <div class="row">
+            <span class="pill">Commission-Free</span>
+            <span class="pill">Low Risk</span>
+          </div>
+          <p>Expected Returns: 6.5% p.a. • Minimum Investment: ₹5,000</p>
+          <div class="row">
+            <button class="btn small">Learn More</button>
+            <button class="btn ghost small">Save for Later</button>
+          </div>
+        </div>
+        <div class="card">
+          <strong>SBI Tax Saver FD</strong>
+          <p>Save taxes while earning guaranteed returns on your fixed deposit</p>
+          <div class="row">
+            <span class="pill">High Returns</span>
+            <span class="pill">Low Risk</span>
+          </div>
+          <p>Expected Returns: 7% p.a. • Minimum Investment: ₹1,000</p>
+          <div class="row">
+            <button class="btn small">Learn More</button>
+            <button class="btn ghost small">Save for Later</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Your Spending Story — Recent transactions</h3>
+      <div class="row">
+        <button class="btn small">Filter</button>
+      </div>
+      <div class="list-item">
+        <strong>Swiggy — Lunch Order</strong> • Food & Dining • ₹450 • 2 hours ago
+        <span class="pill ok">Smart spending</span>
+      </div>
+      <div class="list-item">
+        <strong>Uber — Evening Ride</strong> • Transport • ₹280 • 5 hours ago
+        <span class="pill ok">Smart spending</span>
+        <p class="bad">Hidden charge detected — ₹15 platform fee not shown upfront</p>
+      </div>
+      <div class="list-item">
+        <strong>Amazon — Electronics</strong> • Shopping • ₹3,500 • Yesterday
+        <span class="pill ok">Smart spending</span>
+      </div>
+      <div class="list-item">
+        <strong>Netflix Subscription</strong> • Entertainment • ₹649 • 2 days ago
+        <span class="pill">Self-care is important</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Learn & Protect (Feed, Paths, Quizzes, Experts, Regulations) ===== -->
+  <section id="learn" class="screen">
+    <h2>Financial Education Hub</h2>
+    <div class="card">
+      <input type="text" placeholder="Search financial topics, guides, or experts ..." />
+      <div class="tabs" id="learnTabs">
+        <span class="tab active" data-learn="Feed">Feed</span>
+        <span class="tab" data-learn="Paths">Paths</span>
+        <span class="tab" data-learn="Quizzes">Quizzes</span>
+        <span class="tab" data-learn="Experts">Experts</span>
+        <span class="tab" data-learn="Regulations">Regulations</span>
+      </div>
+      <div class="row">
+        <span class="pill">Filter by Topic</span>
+        <span class="chip">All Topics • 156 articles</span>
+        <span class="chip">Credit Building • 32</span>
+        <span class="chip">Investment Basics • 45</span>
+        <span class="chip">Cyber Security • 28</span>
+        <span class="chip">Smart Savings • 38</span>
+        <span class="chip">Regulations • 13</span>
+      </div>
+    </div>
+
+    <!-- Feed -->
+    <div class="card learn-pane" data-pane="Feed">
+      <h3>All Content</h3>
+      <div class="card">
+        <strong>Understanding Your Credit Score: The Basics</strong>
+        <p>Your credit score is like your financial report card. A good score (750+) opens doors to better loans.</p>
+        <span class="chip">Credit Building • New</span>
+      </div>
+      <div class="card">
+        <strong>SIP vs Lump Sum: Which Investment Strategy Wins?</strong>
+        <p>SIPs are like planting seeds regularly—small amounts grow over time. Lump sum is planting a full-grown tree at once.</p>
+        <span class="chip">Investment Basics</span>
+      </div>
+      <div class="card">
+        <strong>Spotting Phishing Scams: Red Flags to Watch</strong>
+        <p>Phishing is someone pretending to be your bank to steal your password. Real banks NEVER ask for passwords via email or SMS.</p>
+        <span class="chip">Cyber Security • New</span>
+        <div class="row">
+          <span class="pill">Check sender email address carefully</span>
+          <span class="pill">Look for spelling mistakes</span>
+        </div>
+      </div>
+      <div class="card">
+        <strong>Emergency Fund 101: How Much Do You Really Need?</strong>
+        <p>Aim for 6 months of expenses. Keep funds easily accessible.</p>
+        <span class="chip">Smart Savings</span>
+        <div class="row">
+          <span class="pill">Calculate 6 months of essential expenses</span>
+          <span class="pill">Keep funds accessible</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paths -->
+    <div class="card learn-pane" data-pane="Paths" style="display:none">
+      <h3>Learning Paths — 3 available</h3>
+      <div class="grid cols-2">
+        <div class="card">
+          <strong>Financial Literacy Fundamentals</strong>
+          <p>Master the basics of personal finance. Perfect for absolute beginners.</p>
+          <p>Progress: 5/12 modules</p>
+          <div class="row">
+            <button class="btn small">Continue Learning</button>
+          </div>
+        </div>
+        <div class="card">
+          <strong>Investment Mastery for Gen Z</strong>
+          <p>Grow wealth through smart investments. Covers mutual funds, stocks, retirement planning.</p>
+          <p>Progress: 0/18 modules</p>
+          <div class="row">
+            <button class="btn small">Start Path</button>
+          </div>
+        </div>
+        <div class="card">
+          <strong>Credit Score Optimization (Beginner)</strong>
+          <p>Build and maintain an excellent credit score. Understand reports, dispute errors, maximize benefits.</p>
+          <p>Progress: 9/9 modules</p>
+          <div class="row">
+            <button class="btn small">Continue Learning</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quizzes -->
+    <div class="card learn-pane" data-pane="Quizzes" style="display:none">
+      <h3>Test Your Knowledge — 3 quizzes</h3>
+      <div class="grid cols-2">
+        <div class="card">
+          <strong>Credit Score Basics Quiz</strong>
+          <p>10 questions • 5 mins • Best Score: 85%</p>
+          <button class="btn small">Start Quiz</button>
+        </div>
+        <div class="card">
+          <strong>Investment Strategy Challenge</strong>
+          <p>15 questions • 10 mins • Best Score: 92%</p>
+          <button class="btn small">Retake Quiz</button>
+        </div>
+        <div class="card">
+          <strong>Cyber Security Awareness</strong>
+          <p>12 questions • 7 mins</p>
+          <button class="btn small">Retake Quiz</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Experts -->
+    <div class="card learn-pane" data-pane="Experts" style="display:none">
+      <h3>Featured Experts — 3 verified</h3>
+      <div class="grid cols-2">
+        <div class="card">
+          <strong>Priya Sharma</strong>
+          <p>Certified Financial Planner • Investment Planning • 12.5K followers</p>
+          <p>32 articles • 4.9 rating</p>
+          <button class="btn small">Follow</button>
+        </div>
+        <div class="card">
+          <strong>Rahul Mehta</strong>
+          <p>Cybersecurity Expert • Digital Security • 8.3K followers</p>
+          <p>58 articles • 4.7 rating</p>
+          <button class="btn small">Follow</button>
+        </div>
+        <div class="card">
+          <strong>Anjali Desai</strong>
+          <p>Credit Counselor • Credit Management • 15.2K followers</p>
+          <p>45 articles • 4.8 rating</p>
+          <button class="btn small">Follow</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Regulations -->
+    <div class="card learn-pane" data-pane="Regulations" style="display:none">
+      <h3>Regulations Simplified — 3 explained</h3>
+      <div class="card">
+        <strong>RBI Guidelines on Digital Lending</strong>
+        <p>Banking Regulations</p>
+      </div>
+      <div class="card">
+        <strong>SEBI Mutual Fund Disclosure Norms</strong>
+        <p>Investment Regulations</p>
+      </div>
+      <div class="card">
+        <strong>Credit Information Companies Act</strong>
+        <p>Credit Regulations</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Security Center (Sarthi) ===== -->
+  <section id="secure" class="screen">
+    <h2>Security Center</h2>
+    <div class="card">
+      <div class="row">
+        <span class="pill">Secure • All systems protected • Just now</span>
+      </div>
+      <p>Your financial safety is our top priority. We're watching over your money 24/7.</p>
+      <div class="grid cols-2">
+        <div class="card">
+          <strong>Two-Factor Authentication</strong>
+          <p class="bad">Disabled</p>
+          <p>Add an extra layer of security to your account</p>
+          <button class="btn small">Enable 2FA</button>
+        </div>
+        <div class="card">
+          <strong>Report Security Incident</strong>
+          <p>Notice something suspicious? Let us know immediately</p>
+          <button class="btn small">Report an Incident</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Security Status</h3>
+      <div class="grid cols-2">
+        <div class="card">
+          <strong>Account Security</strong>
+          <p class="ok">Protected</p>
+          <p class="muted">Last checked: 2 minutes ago</p>
+        </div>
+        <div class="card">
+          <strong>Transaction Monitoring</strong>
+          <p class="ok">Protected</p>
+          <p class="muted">Last checked: 5 minutes ago</p>
+        </div>
+        <div class="card">
+          <strong>Login Attempts</strong>
+          <p>0 Failed • 3 Verified</p>
+        </div>
+        <div class="card">
+          <strong>Active Sessions</strong>
+          <p>2 Devices • Password Strength: Strong</p>
+        </div>
+        <div class="card">
+          <strong>Risk Level</strong>
+          <p class="ok">Low</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Data Encryption</h3>
+      <p>Your data is encrypted, but 2FA is recommended</p>
+      <div class="row">
+        <span class="chip">Encryption Status: Active</span>
+        <span class="chip bad">2FA Status: Not Enabled</span>
+        <span class="chip">Backup Status: Current</span>
+        <span class="muted">Last checked: 10 minutes ago</span>
+      </div>
+      <div class="card">
+        <h3>Quick Security Tips</h3>
+        <ul>
+          <li>Never share OTPs with anyone</li>
+          <li>Use different passwords for each account</li>
+          <li>Enable 2FA for extra protection</li>
+          <li>Check URLs before entering details</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Goals (Sarthi) ===== -->
+  <section id="goals" class="screen">
+    <h2>Your Financial Goals</h2>
+    <div class="grid cols-2">
+      <div class="card">
+        <h3>Dream Goa Trip • Travel & Adventure</h3>
+        <p>₹32,000 / ₹50,000 • 64%</p>
+        <div class="progress"><span style="width:64%"></span></div>
+        <div class="row">
+          <span class="chip">Time left: -199 day</span>
+          <span class="chip">Streak: 45 days</span>
+        </div>
+        <button class="btn small">Contribute</button>
+      </div>
+      <div class="card">
+        <h3>Skill Development Course • Education</h3>
+        <p>₹15,000 / ₹25,000 • 60%</p>
+        <div class="progress"><span style="width:60%"></span></div>
+        <div class="row">
+          <span class="chip">Time left: -235 day</span>
+          <span class="chip">Streak: 22 days</span>
+        </div>
+        <button class="btn small">Contribute</button>
+      </div>
+      <div class="card">
+        <h3>New iPhone 16 • Gadgets & Tech</h3>
+        <p>₹48,000 / ₹80,000 • 60%</p>
+        <div class="progress"><span style="width:60%"></span></div>
+        <div class="row">
+          <span class="chip">Time left: -133 day</span>
+          <span class="chip">Streak: 30 days</span>
+        </div>
+        <p class="ok">Milestone reached! Keep going!</p>
+        <button class="btn small">Contribute</button>
+      </div>
+      <div class="card">
+        <h3>Home Setup Fund • Home & Living</h3>
+        <p>₹45,000 / ₹1,50,000 • 30%</p>
+        <div class="progress"><span style="width:30%"></span></div>
+        <div class="row">
+          <span class="chip">Time left: 0 day</span>
+          <span class="chip">Streak: 15 days</span>
+        </div>
+        <button class="btn small">Contribute</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <span class="pill">Secure • All systems protected • Just now</span>
+        <button class="btn small">+ Create Goal</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Sarthi Mentor — Your financial companion</h3>
+      <div class="bubble">03:32 PM — I'm feeling good! Just contributed ₹2,000 today.</div>
+      <div class="bubble">03:33 PM — That's fantastic! You're building great habits. At this pace, you'll hit your next milestone in 2 weeks. Want to celebrate?</div>
+      <div class="bubble me">03:34 PM — I'm feeling stressed</div>
+      <div class="row">
+        <button class="btn small">Need motivation</button>
+        <button class="btn small">Doing great!</button>
+        <button class="btn small">Adjust goal</button>
+      </div>
+      <input type="text" placeholder="Share how you're feeling ..." />
+    </div>
+
+    <div class="card">
+      <h3>Your Progress</h3>
+      <div class="row">
+        <span class="chip">Total Saved: ₹1,40,000</span>
+        <span class="chip">Active Goals: 4</span>
+        <span class="chip">Longest Streak: 45 days</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Mentor (Sarthi chat snippet) ===== -->
+  <section id="mentor" class="screen">
+    <h2>Sarthi — Your Money Mentor</h2>
+    <div class="card">
+      <p class="muted">Always here to help • Online</p>
+      <div class="bubble">Hey there! I noticed you've been doing great with your savings. How are you feeling about your financial goals today?</div>
+      <div class="bubble me">I'm feeling a bit worried about my emergency fund. Is ₹45,000 enough?</div>
+      <div class="bubble">I understand that concern—it's really smart that you're thinking about this!</div>
+      <div class="row">
+        <button class="btn small">How can I save more?</button>
+        <button class="btn small">Explain my expenses</button>
+        <button class="btn small">Investment tips</button>
+        <button class="btn small">Budget help</button>
+      </div>
+      <input type="text" placeholder="Ask Sarthi anything about your money..." />
+    </div>
+  </section>
+
+  <!-- ===== Achievements (Sarthi) ===== -->
+  <section id="achievements" class="screen">
+    <h2>Your Achievements — 19 unlocked</h2>
+    <div class="grid cols-2">
+      <div class="card">
+        <h3>Levels</h3>
+        <div class="row">
+          <span class="badge">Level 1 — Starter</span>
+          <span class="badge">Level 2 — Builder</span>
+          <span class="badge">Level 3 — Achiever</span>
+          <span class="badge">Level 4 — Master</span>
+          <span class="badge">Level 5 — Legend</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Recent Milestones</h3>
+        <div class="list-item"><strong>Consistent Saver</strong> — Saved for 30 consecutive days • 2 days ago</div>
+        <div class="list-item"><strong>Goal Crusher</strong> — Reached 50% of Goa Trip goal • 1 week ago</div>
+        <div class="list-item"><strong>Smart Planner</strong> — Created 3 financial goals • 2 weeks ago</div>
+        <p class="muted">Next Achievement: Save ₹5,000 more to unlock "Consistent Saver" badge and reach Level 4!</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Smart Recommendations</h3>
+      <div class="list-item">
+        <strong>Boost Your Goa Trip Savings</strong> — You're doing great! Consider increasing your monthly contribution to reach your goal faster.
+        <div class="row"><button class="btn small">Apply Recommendation</button></div>
+      </div>
+      <div class="list-item">
+        <strong>Optimize Emergency Fund Strategy</strong> — Let's adjust your emergency fund to better match your current expenses.
+        <div class="row"><button class="btn small">Apply Recommendation</button></div>
+      </div>
+      <p class="muted">Commission-free • Transparent • Personalized for you</p>
+    </div>
+  </section>
+
+  <!-- ===== Hidden Charge Scanner ===== -->
+  <section id="charges" class="screen">
+    <h2>Hidden Charge Scanner</h2>
+    <div class="card">
+      <h3>Fees you might have missed</h3>
+      <div class="row">
+        <span class="chip">Total Found: ₹120</span>
+      </div>
+      <div class="list-item">
+        <strong>Platform Fee — Uber Rides</strong> • ₹45
+      </div>
+      <div class="list-item">
+        <strong>Late Payment Fee — Electricity Bill</strong> • ₹50
+      </div>
+      <div class="list-item">
+        <strong>Convenience Fee — Credit Card Payment</strong> • ₹25
+      </div>
+      <p class="muted">Sarthi is watching out for you — We scan your transactions daily to catch unexpected fees.</p>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // ===== Navigation: switch screens =====
+  const navButtons = document.querySelectorAll('.nav button');
+  const screens = document.querySelectorAll('.screen');
+  navButtons.forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      navButtons.forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const target = btn.getAttribute('data-target');
+      screens.forEach(s=>{
+        s.classList.toggle('active', s.id===target);
+      });
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+
+  // ===== Create Post: template & AR filter tabs =====
+  function setupTabs(containerId){
+    const container = document.getElementById(containerId);
+    if(!container) return;
+    const tabs = container.querySelectorAll('.tab');
+    tabs.forEach(tab=>{
+      tab.addEventListener('click',()=>{
+        tabs.forEach(t=>t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
+  }
+  setupTabs('postTemplates');
+  setupTabs('arFilters');
+
+  // ===== Learn & Protect: section tabs =====
+  const learnTabs = document.querySelectorAll('#learnTabs .tab');
+  const learnPanes = document.querySelectorAll('.learn-pane');
+  learnTabs.forEach(tab=>{
+    tab.addEventListener('click',()=>{
+      learnTabs.forEach(t=>t.classList.remove('active'));
+      tab.classList.add('active');
+      const pane = tab.getAttribute('data-learn');
+      learnPanes.forEach(p=>{
+        p.style.display = (p.getAttribute('data-pane')===pane) ? 'block' : 'none';
+      });
+    });
+  });
+</script>
 </body>
 </html>
 
-      
 
+   
+                   
+                   
+                      
+                       
+                   
+
+            
        
                
                 
